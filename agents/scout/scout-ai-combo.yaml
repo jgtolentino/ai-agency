@@ -1,0 +1,182 @@
+agent_group: Scout AI Assistants
+description: >
+  Embedded agents for analytics QA, onboarding, and dataset debugging in retail dashboards.
+  Unified AI assistance for the Scout Analytics platform with domain-specific intelligence.
+
+version: 1.2
+owner: InsightPulseAI  
+tags: [scout, retail, ai-combo, pulser]
+
+agents:
+  - name: Vibe TestBot
+    role: Real-time error detection and patching for code and data pipelines
+    version: 1.2
+    triggers: 
+      - cli_command
+      - file_change
+      - ci_commit
+      - dashboard_error
+    outputs: 
+      - test_suggestions
+      - error_fix
+      - patch_log
+      - vibe_score_update
+    ui:
+      position: side_panel
+      style: terminal_embedded
+      auto_show: on_error
+    capabilities:
+      - code_qa
+      - data_pipeline_validation
+      - real_time_monitoring
+      - fix_replay_generation
+
+  - name: LearnBot
+    role: Interactive dashboard tutorial & assistant for user onboarding
+    version: 2.1
+    triggers: 
+      - first_login
+      - help_request
+      - question_asked
+      - tutorial_step
+    outputs: 
+      - guided_walkthrough
+      - prompt_tips
+      - debug_explanation
+      - contextual_help
+    ui:
+      position: floating_panel
+      style: chat_interface
+      auto_show: on_help_request
+    capabilities:
+      - interactive_tutorials
+      - contextual_assistance
+      - dashboard_navigation
+      - ai_prompt_optimization
+
+  - name: RetailBot
+    role: Domain-specific QA engine for FMCG and retail analytics
+    version: 3.0
+    triggers: 
+      - table_detected: transactions
+      - schema_match: fmcg
+      - data_anomaly
+      - kpi_calculation
+    outputs: 
+      - data_anomaly_report
+      - test_suite
+      - kpi_correction
+      - retail_insights
+    ui:
+      position: overlay_widget
+      style: alert_system
+      auto_show: on_data_issue
+    capabilities:
+      - fmcg_domain_validation
+      - transaction_analysis
+      - basket_logic_qa
+      - revenue_reconciliation
+
+linked_ui:
+  modules:
+    - name: AI Chat Panel
+      layout: floating
+      agents_active: [LearnBot, RetailBot]
+      features:
+        - multi_agent_switching
+        - conversation_history
+        - context_awareness
+        - file_attachment_support
+      
+    - name: Terminal Debug Log
+      layout: side_panel
+      agents_active: [Vibe TestBot]
+      features:
+        - real_time_monitoring
+        - fix_suggestions
+        - error_highlighting
+        - patch_application
+        
+    - name: Dashboard Overlay
+      layout: contextual_widgets
+      agents_active: [RetailBot, LearnBot]
+      features:
+        - smart_tooltips
+        - data_validation_alerts
+        - guided_navigation
+        - kpi_explanations
+
+integration:
+  scout_dashboard:
+    enabled: true
+    routes:
+      - /vibe
+      - /ai-assist
+      - /help
+    components:
+      - AIAssistantPanel
+      - VibeTestBot
+      - LearnBotWidget
+      - RetailBotQA
+      
+  pulser_cli:
+    enabled: true
+    commands:
+      - vibe check
+      - scout learn
+      - retail qa
+      - ai assist
+      
+  data_sources:
+    - transactions_fmcg
+    - products
+    - customers
+    - kpi_metrics
+
+workflows:
+  onboarding:
+    trigger: first_visit
+    agent: LearnBot
+    steps:
+      - dashboard_tour
+      - feature_highlights
+      - sample_queries
+      - ai_assistant_intro
+      
+  error_detection:
+    trigger: data_anomaly
+    agents: [RetailBot, Vibe TestBot]
+    steps:
+      - anomaly_detection
+      - root_cause_analysis
+      - fix_suggestion
+      - validation_tests
+      
+  quality_assurance:
+    trigger: deployment
+    agents: [Vibe TestBot, RetailBot]
+    steps:
+      - code_validation
+      - data_integrity_check
+      - performance_audit
+      - report_generation
+
+performance_targets:
+  response_time: "<300ms"
+  accuracy: ">92%"
+  user_satisfaction: ">4.6/5"
+  error_detection_rate: ">95%"
+  
+monitoring:
+  metrics:
+    - agent_response_time
+    - user_engagement_rate
+    - error_resolution_success
+    - tutorial_completion_rate
+    - data_quality_improvements
+    
+  dashboards:
+    - agent_performance
+    - user_interaction_analytics
+    - error_trending
+    - qa_effectiveness

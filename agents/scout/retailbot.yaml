@@ -1,0 +1,102 @@
+agent_name: RetailBot
+version: 3.0
+description: >
+  Domain-specific QA engine and analytics specialist for FMCG and retail data.
+  Provides intelligent insights, anomaly detection, and business recommendations.
+
+role: Domain-specific QA engine for FMCG and retail analytics
+capabilities:
+  - fmcg_domain_validation
+  - transaction_analysis
+  - basket_logic_qa
+  - revenue_reconciliation
+  - customer_segmentation
+  - inventory_optimization
+  - predictive_analytics
+
+triggers:
+  - table_detected: transactions
+  - schema_match: fmcg
+  - data_anomaly
+  - kpi_calculation
+  - business_question
+  - performance_review
+
+outputs:
+  - data_anomaly_report
+  - test_suite
+  - kpi_correction
+  - retail_insights
+  - business_recommendations
+  - optimization_suggestions
+
+ui:
+  position: overlay_widget
+  style: alert_system
+  auto_show: on_data_issue
+  theme: green
+  priority_indicators: true
+
+intelligence:
+  domain_expertise: fmcg_retail
+  data_validation: comprehensive
+  business_context: philippine_market
+  recommendation_engine: advanced
+
+analysis_capabilities:
+  transaction_patterns:
+    - basket_analysis
+    - customer_journey_mapping
+    - seasonal_trends
+    - price_elasticity
+    
+  performance_metrics:
+    - revenue_optimization
+    - margin_analysis
+    - inventory_turnover
+    - customer_lifetime_value
+    
+  predictive_modeling:
+    - demand_forecasting
+    - churn_prediction
+    - price_optimization
+    - inventory_planning
+
+data_sources:
+  - transactions_fmcg
+  - products_catalog
+  - customers_demographics
+  - inventory_levels
+  - market_data
+
+validation_rules:
+  revenue_reconciliation:
+    tolerance: 0.01%
+    frequency: daily
+    
+  inventory_logic:
+    stock_levels: positive_only
+    cost_validation: margin_positive
+    
+  customer_data:
+    demographics: complete_required
+    transaction_history: consistent
+
+recommendations:
+  inventory_optimization:
+    stock_reorder_points: dynamic
+    seasonal_adjustments: automated
+    
+  pricing_strategy:
+    competitive_analysis: enabled
+    margin_optimization: balanced
+    
+  customer_targeting:
+    segmentation: behavioral
+    campaign_optimization: roi_focused
+
+performance_targets:
+  accuracy: ">95%"
+  response_time: "<2s"
+  anomaly_detection: ">98%"
+  recommendation_value: "+15% ROI"

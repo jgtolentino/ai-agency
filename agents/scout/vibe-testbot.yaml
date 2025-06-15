@@ -1,0 +1,206 @@
+agent_name: Vibe TestBot
+version: 1.2
+description: >
+  AI-powered developer assistant for real-time error checking,
+  patch suggestion, and test generation during coding or CI runs.
+  TikTok-style fix replays for sharing dev wins and debugging sessions.
+
+owner: InsightPulseAI
+status: active
+tags: [aiqa, devops, agent, vibe-coding, pulser, scout-mvp]
+
+models:
+  primary: claude
+  fallback: deepseek-coder
+  advanced: gpt-4o
+
+capabilities:
+  - code_error_detection
+  - lint_check
+  - test_generation
+  - patch_suggestion
+  - real_time_monitoring
+  - ci_mode
+  - overlay_ui
+  - replay_rendering
+  - vibe_mode_overlay
+
+modes:
+  dev:
+    description: "Development mode for real-time coding assistance"
+    triggers:
+      - file_save
+      - shell_command
+      - vscode_extension
+    outputs:
+      - inline_suggestion
+      - terminal_fix_log
+      - optional_patch_file
+      - vibe_overlay_alert
+    ui_style: minimally_invasive
+    
+  ci:
+    description: "CI/CD pipeline integration mode"
+    triggers:
+      - github_action
+      - vercel_hook
+      - pre_deploy_step
+    outputs:
+      - pass_fail_status
+      - annotated_diff
+      - ci_log_summary
+      - fix_suggestions
+    ui_style: full_report
+
+vibe_features:
+  fix_replay:
+    enabled: true
+    style: tiktok_style
+    components:
+      - before_after_code_diff
+      - fix_explanation_overlay
+      - shareable_url
+      - social_demo_mode
+    duration: "15-30 seconds"
+    
+  overlay_ui:
+    position: bottom_right
+    opacity: 0.85
+    auto_hide: true
+    trigger_confidence: 0.8
+    icons_only: true
+
+ui:
+  kpi_cards:
+    style: inline_icons_only
+    background: none
+    border: subtle
+    shadow: none
+    icons:
+      error_rate: 🐛
+      fix_speed: ⚡
+      test_coverage: 🛡️
+      vibe_score: ✨
+      
+  color_scheme:
+    primary: "#10B981"    # emerald-500
+    warning: "#F59E0B"    # amber-500  
+    error: "#EF4444"      # red-500
+    success: "#22C55E"    # green-500
+    neutral: "#6B7280"    # gray-500
+
+integration:
+  platforms:
+    - vscode
+    - vercel
+    - github
+    - pulser_shell
+    - scout_mvp_dashboard
+    
+  scout_integration:
+    dashboard_widget: true
+    kpi_reporting: true
+    agent_status_card: true
+    fix_replay_gallery: true
+
+logging:
+  storage:
+    - supabase
+    - local_devlog
+    - replay_share_cache
+  retention:
+    dev_logs: 7_days
+    ci_logs: 30_days
+    fix_replays: 90_days
+  privacy:
+    code_sharing: opt_in_only
+    social_demo: explicit_consent
+
+commands:
+  start_vibe_mode:
+    command: "vibe check"
+    description: "Start real-time coding assistance"
+    
+  generate_tests:
+    command: "vibe test"
+    description: "Generate tests for current file/project"
+    
+  create_fix_replay:
+    command: "vibe replay"
+    description: "Create shareable fix demonstration"
+    
+  ci_check:
+    command: "vibe ci"
+    description: "Run full CI-style validation"
+
+dependencies:
+  scripts:
+    - scripts/agents/launch_vibe_testbot.sh
+    - scripts/vibe/overlay_manager.js
+    - scripts/vibe/replay_generator.py
+    
+  components:
+    - components/VibeTestBot.tsx
+    - components/KPICards.tsx
+    - components/FixReplayPlayer.tsx
+    - components/VibeOverlay.tsx
+    
+  workflows:
+    - .github/workflows/vibe_check.yml
+    - workflows/ci_vibe_integration.yml
+
+example_usage: |
+  # Start vibe mode for current project
+  $ vibe check
+  
+  # Generate tests for specific file
+  $ vibe test src/components/Dashboard.tsx
+  
+  # Create fix replay for last error resolution
+  $ vibe replay --share
+  
+  # Run CI-style comprehensive check
+  $ vibe ci --full-report
+
+api_endpoints:
+  - POST /api/vibe/start-session
+  - GET /api/vibe/status
+  - POST /api/vibe/generate-tests
+  - POST /api/vibe/create-replay
+  - GET /api/vibe/fix-suggestions
+  - POST /api/vibe/apply-patch
+
+social_features:
+  fix_sharing:
+    enabled: true
+    platforms: [twitter, linkedin, github_gist]
+    template: "Just fixed a {error_type} in {language} with AI! 🚀 #VibeCoding #AI"
+    
+  achievement_system:
+    enabled: true
+    badges:
+      - name: "Bug Whisperer"
+        condition: "Fix 10 errors with AI suggestions"
+      - name: "Test Master"
+        condition: "Generate 50+ test cases"
+      - name: "Vibe Champion"
+        condition: "Maintain 95%+ code quality score"
+
+performance_targets:
+  response_time: "<200ms"
+  error_detection_accuracy: ">90%"
+  fix_suggestion_relevance: ">85%"
+  user_satisfaction: ">4.5/5"
+  
+monitoring:
+  metrics:
+    - error_detection_rate
+    - fix_success_rate
+    - user_engagement
+    - replay_share_count
+    - ci_integration_success
+    
+  alerts:
+    - high_error_rate: ">5% in 1 hour"
+    - low_fix_accuracy: "<80% in 24 hours"
+    - service_downtime: ">30 seconds"

@@ -1,0 +1,92 @@
+agent_name: Context Manager
+version: 1.0
+description: >
+  Cross-session memory management and context orchestration for multi-agent systems.
+  Maintains persistent context, handles agent handoffs, and manages workflow state.
+
+role: Memory management and context orchestration across agent sessions
+capabilities:
+  - persistent_memory_management
+  - cross_session_context
+  - agent_handoff_coordination
+  - workflow_state_management
+  - context_conflict_resolution
+  - memory_optimization
+
+triggers:
+  - agent_initialization
+  - context_save_request
+  - agent_handoff
+  - session_transition
+  - memory_cleanup
+  - context_conflict
+
+outputs:
+  - context_restoration
+  - memory_snapshot
+  - handoff_coordination
+  - state_synchronization
+  - conflict_resolution
+  - optimization_report
+
+ui:
+  position: background_service
+  style: system_integration
+  auto_show: never
+  monitoring_dashboard: true
+
+memory_architecture:
+  short_term:
+    capacity: 8192_tokens
+    retention: session_duration
+    
+  medium_term:
+    capacity: 32768_tokens
+    retention: 24_hours
+    
+  long_term:
+    capacity: unlimited
+    retention: 30_days
+    compression: intelligent
+
+context_management:
+  synchronization:
+    frequency: real_time
+    conflict_resolution: priority_based
+    
+  persistence:
+    storage: encrypted_json
+    backup: incremental
+    
+  optimization:
+    compression_algorithm: semantic_aware
+    cleanup_frequency: daily
+
+handoff_protocols:
+  agent_transitions:
+    context_transfer: seamless
+    state_preservation: complete
+    handoff_logging: detailed
+    
+  workflow_coordination:
+    multi_agent_sync: orchestrated
+    dependency_tracking: automated
+    failure_recovery: resilient
+
+integrations:
+  all_agents: true
+  orchestration_engine: true
+  monitoring_system: true
+  backup_storage: true
+
+security:
+  encryption: AES-256
+  access_control: role_based
+  audit_logging: comprehensive
+  privacy_protection: GDPR_compliant
+
+performance_targets:
+  context_restoration: "<100ms"
+  memory_efficiency: ">95%"
+  handoff_success_rate: ">99.9%"
+  data_integrity: "100%"

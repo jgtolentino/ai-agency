@@ -1,0 +1,144 @@
+# AI Agency - Agent Manifest Registry
+# Central registry of all available agents with metadata and capabilities
+
+manifest_version: "2.0.0"
+generated_at: "2025-06-15T12:00:00Z"
+last_updated: "2025-06-15T12:00:00Z"
+total_agents: 6
+
+# Scout Analytics Platform Agents
+scout_agents:
+  learnbot:
+    version: "2.1"
+    file: "agents/scout/learnbot.yaml"
+    role: "Tutorial and onboarding assistant"
+    capabilities: ["tutorials", "help", "onboarding", "navigation"]
+    ui_position: "floating_panel"
+    status: "active"
+    compatibility: ["scout-mvp", "scout-analytics"]
+    dependencies: []
+    
+  retailbot:
+    version: "3.0" 
+    file: "agents/scout/retailbot.yaml"
+    role: "FMCG analytics specialist"
+    capabilities: ["analytics", "retail", "forecasting", "validation"]
+    ui_position: "overlay_widget"
+    status: "active"
+    compatibility: ["scout-mvp", "retail-insights"]
+    dependencies: ["context-manager"]
+    
+  vibe-testbot:
+    version: "1.2"
+    file: "agents/scout/vibe-testbot.yaml"
+    role: "AI code QA assistant"
+    capabilities: ["code_qa", "testing", "validation", "replays"]
+    ui_position: "side_panel"
+    status: "active"
+    compatibility: ["scout-mvp", "dev-platforms"]
+    dependencies: []
+    
+  scout-ai-combo:
+    version: "1.2"
+    file: "agents/scout/scout-ai-combo.yaml"
+    role: "Unified agent orchestration"
+    capabilities: ["orchestration", "multi_agent", "integration"]
+    ui_position: "orchestrator"
+    status: "active"
+    compatibility: ["scout-mvp"]
+    dependencies: ["learnbot", "retailbot", "vibe-testbot", "context-manager"]
+
+# CES Campaign Intelligence Agents  
+ces_agents:
+  cesai:
+    version: "3.0"
+    file: "agents/ces/cesai.yaml"
+    role: "Campaign effectiveness analyzer"
+    capabilities: ["campaigns", "analysis", "optimization", "prediction"]
+    ui_position: "main_panel"
+    status: "active"
+    compatibility: ["ces-platform", "campaign-tools"]
+    dependencies: ["context-manager"]
+
+# Shared Infrastructure Agents
+shared_agents:
+  context-manager:
+    version: "1.0"
+    file: "agents/shared/context-manager.yaml"
+    role: "Memory and context orchestration"
+    capabilities: ["memory", "context", "orchestration", "persistence"]
+    ui_position: "background_service"
+    status: "active"
+    compatibility: ["all"]
+    dependencies: []
+
+# Agent Combinations and Workflows
+combinations:
+  scout_full_stack:
+    agents: ["learnbot", "retailbot", "vibe-testbot", "context-manager"]
+    orchestrator: "scout-ai-combo"
+    use_cases: ["full_dashboard_experience", "analytics_development"]
+    
+  ces_intelligence:
+    agents: ["cesai", "context-manager"]
+    use_cases: ["campaign_analysis", "creative_optimization"]
+    
+  development_qa:
+    agents: ["vibe-testbot", "context-manager"]
+    use_cases: ["code_review", "quality_assurance", "testing"]
+
+# Platform Compatibility Matrix
+compatibility_matrix:
+  scout-mvp:
+    supported_agents: ["learnbot", "retailbot", "vibe-testbot", "scout-ai-combo", "context-manager"]
+    recommended_combo: "scout_full_stack"
+    
+  ces-platform:
+    supported_agents: ["cesai", "context-manager"] 
+    recommended_combo: "ces_intelligence"
+    
+  development:
+    supported_agents: ["vibe-testbot", "context-manager"]
+    recommended_combo: "development_qa"
+
+# Version Compatibility
+version_requirements:
+  pulser_cli: ">=1.5.0"
+  node_js: ">=18.0.0"
+  python: ">=3.9.0"
+
+# Update Channels
+update_channels:
+  stable:
+    frequency: "monthly"
+    testing_required: true
+    
+  beta:
+    frequency: "weekly"
+    testing_required: false
+    
+  dev:
+    frequency: "daily" 
+    testing_required: false
+
+# Performance Benchmarks
+performance_benchmarks:
+  agent_load_time: "<2s"
+  memory_usage: "<512MB"
+  response_time: "<500ms"
+  concurrent_agents: "5+"
+  uptime_target: "99.9%"
+
+# Monitoring and Analytics
+monitoring:
+  metrics_collection: true
+  performance_tracking: true
+  error_reporting: true
+  usage_analytics: true
+  
+# Security and Compliance
+security:
+  encryption: "AES-256"
+  access_control: "role_based"
+  audit_logging: true
+  privacy_compliance: "GDPR"

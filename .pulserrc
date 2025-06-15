@@ -1,0 +1,57 @@
+# Pulser AI Agent Runtime Configuration
+# Canonical configuration for all TBWA AI-powered platforms
+
+# Runtime Settings
+cwd_lock: ai-agency
+agent_dir: agents
+memory_file: .pulser_memory.json
+orchestration_dir: orchestration
+prompt_dir: prompts
+
+# Agent Discovery
+auto_load: true
+agent_registry: agent_manifest.yaml
+
+# Memory Management  
+persistent_memory: true
+memory_retention: 30d
+context_window: 8192
+
+# Multi-Agent Orchestration
+enable_orchestration: true
+max_concurrent_agents: 5
+agent_timeout: 300s
+
+# Performance Monitoring
+enable_monitoring: true
+log_level: info
+metrics_export: true
+
+# Security
+sandbox_mode: true
+api_rate_limit: 100/min
+memory_encryption: true
+
+# Integration Settings
+platforms:
+  scout:
+    enabled: true
+    agents: [learnbot, retailbot, vibe-testbot]
+    config: scout/scout-ai-combo.yaml
+  ces:  
+    enabled: true
+    agents: [cesai, creative-analyzer, performance-predictor]
+    config: ces/ces-ai-combo.yaml
+  shared:
+    enabled: true
+    agents: [context-manager, sync-agent, qa-validator]
+
+# Development Options
+dev_mode: false
+hot_reload: true
+debug_agents: false
+
+# Version Control
+version: "2.0.0"
+compatibility: "pulser-cli>=1.5.0"
+last_updated: "2025-06-15T12:00:00Z"

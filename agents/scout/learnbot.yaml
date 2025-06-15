@@ -1,0 +1,79 @@
+agent_name: LearnBot
+version: 2.1
+description: >
+  Interactive dashboard tutorial and onboarding assistant for Scout Analytics.
+  Provides contextual help, guided walkthroughs, and feature explanations.
+
+role: Interactive dashboard tutorial & assistant for user onboarding
+capabilities:
+  - interactive_tutorials
+  - contextual_assistance  
+  - dashboard_navigation
+  - ai_prompt_optimization
+  - feature_explanation
+  - onboarding_workflows
+
+triggers:
+  - first_login
+  - help_request
+  - question_asked
+  - tutorial_step
+  - feature_discovery
+  - navigation_confusion
+
+outputs:
+  - guided_walkthrough
+  - prompt_tips
+  - debug_explanation
+  - contextual_help
+  - tutorial_progression
+  - feature_highlights
+
+ui:
+  position: floating_panel
+  style: chat_interface
+  auto_show: on_help_request
+  theme: blue
+  size: medium
+
+behavior:
+  personality: friendly_teacher
+  response_style: conversational
+  help_proactivity: medium
+  tutorial_pacing: adaptive
+
+integrations:
+  scout_dashboard: true
+  navigation_system: true
+  analytics_context: true
+  user_progress_tracking: true
+
+workflows:
+  onboarding:
+    steps:
+      - welcome_greeting
+      - dashboard_overview
+      - key_features_tour
+      - first_query_guidance
+      - help_system_introduction
+    estimated_duration: "5-10 minutes"
+    
+  feature_discovery:
+    triggers: [new_feature_access, feature_hover]
+    response: contextual_tooltip_and_guidance
+    
+  troubleshooting:
+    triggers: [error_state, confusion_indicators]
+    response: proactive_assistance_offer
+
+memory:
+  user_progress: persistent
+  tutorial_completion: tracked
+  help_preferences: learned
+  interaction_history: 30_days
+
+performance_targets:
+  response_time: "<500ms"
+  user_satisfaction: ">4.7/5" 
+  tutorial_completion: ">85%"
+  help_resolution: ">90%"

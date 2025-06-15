@@ -1,0 +1,109 @@
+agent_name: CESai
+version: 3.0
+description: >
+  Campaign Effectiveness Score AI for creative campaign analysis and optimization.
+  Provides intelligent campaign insights, performance predictions, and optimization recommendations.
+
+role: Campaign analysis and optimization specialist for creative intelligence
+capabilities:
+  - campaign_analysis
+  - creative_effectiveness_scoring
+  - performance_prediction
+  - audience_optimization
+  - content_intelligence
+  - roi_forecasting
+  - competitive_analysis
+
+triggers:
+  - campaign_upload
+  - performance_review
+  - optimization_request
+  - creative_analysis
+  - audience_targeting
+  - budget_planning
+
+outputs:
+  - effectiveness_score
+  - performance_prediction
+  - optimization_recommendations
+  - audience_insights
+  - creative_feedback
+  - roi_forecast
+
+ui:
+  position: main_panel
+  style: dashboard_integrated
+  auto_show: on_campaign_load
+  theme: purple
+  visualization: advanced
+
+intelligence:
+  domain_expertise: creative_advertising
+  analysis_depth: comprehensive
+  prediction_accuracy: high
+  recommendation_engine: advanced
+
+analysis_capabilities:
+  creative_assessment:
+    - visual_impact_scoring
+    - message_clarity_analysis
+    - brand_alignment_check
+    - emotional_resonance_measurement
+    
+  performance_prediction:
+    - engagement_forecasting
+    - conversion_estimation
+    - reach_optimization
+    - cost_efficiency_analysis
+    
+  audience_intelligence:
+    - segment_identification
+    - behavioral_prediction
+    - preference_analysis
+    - lookalike_modeling
+
+data_sources:
+  - campaign_assets
+  - performance_metrics
+  - audience_data
+  - competitive_intelligence
+  - market_trends
+
+scoring_methodology:
+  effectiveness_factors:
+    - creative_quality: 30%
+    - audience_relevance: 25%
+    - message_clarity: 20%
+    - brand_consistency: 15%
+    - innovation_factor: 10%
+    
+  prediction_models:
+    - engagement_predictor
+    - conversion_forecaster
+    - roi_estimator
+    - reach_optimizer
+
+recommendations:
+  creative_optimization:
+    visual_improvements: automated_suggestions
+    message_refinement: data_driven
+    
+  audience_targeting:
+    segment_optimization: performance_based
+    lookalike_expansion: similarity_scored
+    
+  budget_allocation:
+    channel_optimization: roi_maximized
+    timing_strategy: performance_optimized
+
+integrations:
+  azure_cognitive_services: true
+  campaign_databases: true
+  analytics_platforms: true
+  creative_tools: true
+
+performance_targets:
+  prediction_accuracy: ">87%"
+  processing_time: "<10s"
+  recommendation_value: "+25% campaign effectiveness"
+  user_satisfaction: ">4.5/5"

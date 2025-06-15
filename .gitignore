@@ -1,0 +1,62 @@
+# AI Agency - Git Ignore Rules
+
+# Environment and Secrets
+.env
+.env.local
+.env.production
+*.key
+*.pem
+secrets/
+
+# Logs and Monitoring
+*.log
+logs/
+.agent_backups/
+deployment_report_*.md
+
+# Runtime Files
+.pulser_memory_backup.json
+temp/
+cache/
+.temp/
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Build artifacts
+dist/
+build/
+*.tar.gz
+*.zip
+
+# Local development
+local_dev/
+sandbox/
+test_output/
