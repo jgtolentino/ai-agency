@@ -1,0 +1,191 @@
+# SnowWhite Client Delivery Configuration
+# Sanitized version for external client deployment
+
+delivery_version: "Scout Analytics Client v1.0"
+delivery_date: "2025-06-15"
+sanitization_level: "production"
+
+# Client Branding Configuration
+client_branding:
+  enabled: true
+  theme: "sanitized"
+  
+  # White-labeled Component Names
+  component_labels:
+    ai_assistant: "Retail Assistant"
+    learnbot: "Learning Assistant"
+    retailbot: "Analytics Validator" 
+    vibe_testbot: "Quality Checker"
+    insight_validator: "Data Validator"
+    
+  # UI Theme
+  theme_config:
+    primary_color: "#004F4D"
+    accent_color: "#99C2B1"
+    font_family: "Segoe UI, sans-serif"
+    logo_text: "Retail Intelligence Dashboard"
+    
+  # Page Metadata
+  page_metadata:
+    title: "Retail Intelligence Dashboard"
+    description: "Advanced retail analytics and insights platform"
+    keywords: "retail, analytics, insights, dashboard, FMCG"
+    author: "Retail Intelligence Platform"
+
+# Feature Configuration for Client Deployment
+features:
+  # Disabled for Client Delivery
+  pulser_integration: false
+  debug_mode: false
+  development_tools: false
+  agent_internals: false
+  memory_display: hidden
+  console_logging: disabled
+  
+  # Enabled for Client Use
+  export_enabled: true
+  pdf_reports: true
+  csv_downloads: true
+  chart_interactions: true
+  filtering: true
+  search: true
+  dashboard_customization: true
+  
+  # AI Features (Sanitized)
+  ai_assistance: true
+  insight_validation: true
+  automated_analysis: true
+  trend_detection: true
+
+# Security & Privacy for Client Deployment
+security:
+  # Remove all internal references
+  hide_system_info: true
+  sanitize_error_messages: true
+  remove_debug_endpoints: true
+  
+  # Client-safe logging
+  client_analytics: true
+  usage_tracking: anonymized
+  error_reporting: sanitized
+  
+  # Data handling
+  data_retention: 90 # days
+  export_watermarks: false
+  screenshot_protection: false
+
+# UI Sanitization Rules
+ui_sanitization:
+  # Remove/Replace Labels
+  remove_labels:
+    - "InsightPulseAI"
+    - "Pulser"
+    - "ScoutBot"
+    - "TBWA"
+    - "Dev Mode"
+    - "Debug"
+    - "Internal"
+    
+  replace_labels:
+    "LearnBot": "Learning Assistant"
+    "RetailBot": "Analytics Validator"
+    "Vibe TestBot": "Quality Checker"
+    "Agent": "Assistant"
+    "Orchestration": "Automation"
+    
+  # Hide UI Elements
+  hide_elements:
+    - ".debug-panel"
+    - ".dev-tools"
+    - ".agent-status"
+    - ".memory-viewer"
+    - ".system-info"
+    
+  # Footer Sanitization
+  footer_text: "© 2025 Retail Intelligence Dashboard. All rights reserved."
+  
+# Analytics & Monitoring (Client-Safe)
+analytics:
+  enabled: true
+  anonymized: true
+  
+  track_events:
+    - dashboard_views
+    - export_downloads
+    - filter_usage
+    - ai_interactions
+    - insight_validations
+    
+  exclude_events:
+    - debug_actions
+    - agent_internals
+    - system_performance
+    - error_details
+
+# Deployment Configuration
+deployment:
+  environment: "client_production"
+  
+  # Build Settings
+  build_optimizations:
+    minify_code: true
+    remove_comments: true
+    optimize_images: true
+    compress_assets: true
+    
+  # Runtime Settings
+  runtime_config:
+    cache_strategy: "aggressive"
+    preload_critical: true
+    lazy_load_components: true
+    
+  # CDN & Assets
+  asset_management:
+    use_cdn: true
+    cache_duration: 86400 # 24 hours
+    compress_responses: true
+
+# Compliance & Legal
+compliance:
+  gdpr_compliant: true
+  data_processing_notice: true
+  cookie_consent: required
+  
+  legal_notices:
+    privacy_policy: "/legal/privacy"
+    terms_of_service: "/legal/terms"
+    data_usage: "/legal/data-usage"
+
+# Support & Documentation  
+support:
+  # Client-facing documentation
+  user_guide: "/docs/user-guide"
+  feature_overview: "/docs/features"
+  troubleshooting: "/docs/help"
+  
+  # Contact Information (Generic)
+  support_email: "support@retailintelligence.com"
+  documentation_url: "https://docs.retailintelligence.com"
+  
+# Version Control
+versioning:
+  client_version: "1.0.0"
+  api_version: "v1"
+  compatibility_mode: "stable"
+  update_channel: "client_stable"
+  
+# Quality Assurance
+qa_checklist:
+  branding_removed: true
+  debug_disabled: true
+  performance_optimized: true
+  security_hardened: true
+  documentation_updated: true
+  client_tested: true
+
+# Metadata
+metadata:
+  sanitized_by: "SnowWhite Delivery Agent"
+  sanitization_date: "2025-06-15T17:30:00Z"
+  client_delivery_ready: true
+  final_review_complete: true

@@ -1,7 +1,7 @@
 {
-  "name": "ai-agency-canonical",
-  "version": "2.1.0",
-  "description": "Canonical AI Agent Runtime with full interaction stack parity",
+  "name": "retail-intelligence-dashboard",
+  "version": "1.0.0",
+  "description": "AI-powered retail analytics and insights platform",
   "main": "index.js",
   "scripts": {
     "build": "tsc",
@@ -16,19 +16,18 @@
     "start": "node dist/index.js"
   },
   "keywords": [
+    "retail",
+    "analytics",
+    "dashboard",
+    "insights",
     "ai",
-    "agents",
-    "rag",
     "validation",
-    "qa",
-    "learnbot",
-    "retailbot",
-    "vibe-testbot",
-    "supabase",
-    "memory",
-    "chat"
+    "fmcg",
+    "intelligence",
+    "reporting",
+    "visualization"
   ],
-  "author": "TBWA InsightPulseAI",
+  "author": "Retail Intelligence Platform",
   "license": "MIT",
   "dependencies": {
     "@supabase/supabase-js": "^2.39.0",
