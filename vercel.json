@@ -1,15 +1,5 @@
 {
-  "name": "retail-intelligence-dashboard",
   "version": 2,
-  "builds": [
-    {
-      "src": "package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist"
-      }
-    }
-  ],
   "routes": [
     {
       "src": "/api/(.*)",
@@ -82,11 +72,6 @@
     "CLIENT_DEPLOYMENT": "true",
     "SNOWWHITE_SANITIZED": "true"
   },
-  "functions": {
-    "api/**/*.js": {
-      "runtime": "@vercel/node@3.0.0"
-    }
-  },
   "rewrites": [
     {
       "source": "/docs/:path*",
@@ -115,11 +100,5 @@
     }
   ],
   "cleanUrls": true,
-  "trailingSlash": false,
-  "framework": null,
-  "installCommand": "npm install",
-  "buildCommand": "npm run build",
-  "devCommand": "npm run dev",
-  "outputDirectory": "dist",
-  "regions": ["iad1", "sfo1"]
+  "trailingSlash": false
 }
