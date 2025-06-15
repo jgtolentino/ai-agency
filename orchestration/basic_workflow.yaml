@@ -1,0 +1,23 @@
+workflow_name: Basic Multi-Agent Workflow
+version: 1.0
+description: Example orchestration workflow
+
+agents:
+  - name: context-manager
+    role: coordinator
+    priority: 1
+  
+  - name: primary-agent
+    role: executor
+    priority: 2
+    depends_on: [context-manager]
+
+execution:
+  type: sequential
+  timeout: 300s
+  
+steps:
+  - initialize_context
+  - execute_primary_task
+  - save_results
+  - cleanup
