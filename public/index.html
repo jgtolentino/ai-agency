@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Advanced retail analytics and insights platform powered by AI">
+    <meta name="keywords" content="retail, analytics, dashboard, insights, AI, FMCG, intelligence">
+    <meta name="author" content="Retail Intelligence Platform">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Retail Intelligence Dashboard">
+    <meta property="og:description" content="AI-powered retail analytics and insights platform">
+    <meta property="og:url" content="https://retail-intelligence.vercel.app">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:title" content="Retail Intelligence Dashboard">
+    <meta property="twitter:description" content="AI-powered retail analytics and insights platform">
+    
+    <title>Retail Intelligence Dashboard</title>
+    
+    <!-- Client Theme CSS -->
+    <link rel="stylesheet" href="/styles/client-theme.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    
+    <!-- Preload Critical Resources -->
+    <link rel="preload" href="/styles/client-theme.css" as="style">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Security Headers -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    
+    <style>
+        /* Critical CSS for initial load */
+        body {
+            margin: 0;
+            font-family: "Segoe UI", "Roboto", "Helvetica Neue", Arial, sans-serif;
+            background: #FAFAFA;
+            color: #1A1A1A;
+            line-height: 1.6;
+        }
+        
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #FAFAFA;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #E0E0E0;
+            border-top: 3px solid #004F4D;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .header {
+            background: #FFFFFF;
+            border-bottom: 1px solid #E0E0E0;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #004F4D;
+            margin: 0;
+        }
+        
+        .main-content {
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .hero-section {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .hero-title {
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: #004F4D;
+            margin-bottom: 1rem;
+        }
+        
+        .hero-description {
+            font-size: 1.2rem;
+            color: #4A4A4A;
+            max-width: 600px;
+            margin: 0 auto 2rem;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        
+        .feature-card {
+            background: #FFFFFF;
+            border: 1px solid #E0E0E0;
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: all 0.2s ease;
+        }
+        
+        .feature-card:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.12);
+            border-color: #99C2B1;
+        }
+        
+        .feature-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .feature-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #004F4D;
+            margin-bottom: 0.5rem;
+        }
+        
+        .feature-description {
+            color: #4A4A4A;
+            line-height: 1.6;
+        }
+        
+        .btn-primary {
+            background: #004F4D;
+            color: #FFFFFF;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-primary:hover {
+            background: #003330;
+        }
+        
+        .footer {
+            background: #F5F5F5;
+            border-top: 1px solid #E0E0E0;
+            padding: 2rem;
+            text-align: center;
+            color: #757575;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2rem;
+            }
+            
+            .main-content {
+                padding: 1rem;
+            }
+            
+            .header {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Main Application -->
+    <div id="app" style="display: none;">
+        <!-- Header -->
+        <header class="header">
+            <h1 class="logo">Retail Intelligence Dashboard</h1>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Hero Section -->
+            <section class="hero-section">
+                <h1 class="hero-title">AI-Powered Retail Analytics</h1>
+                <p class="hero-description">
+                    Transform your retail data into actionable insights with advanced AI assistance, 
+                    automated validation, and intelligent recommendations.
+                </p>
+                <button class="btn-primary" onclick="initializeDashboard()">
+                    Launch Dashboard
+                </button>
+            </section>
+
+            <!-- Features Grid -->
+            <section class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3 class="feature-title">Advanced Analytics</h3>
+                    <p class="feature-description">
+                        Comprehensive retail performance insights with real-time data processing 
+                        and intelligent trend analysis.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">💬</div>
+                    <h3 class="feature-title">AI Learning Assistant</h3>
+                    <p class="feature-description">
+                        Interactive guidance system with contextual help and personalized 
+                        recommendations for optimal dashboard usage.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">✅</div>
+                    <h3 class="feature-title">Data Validation</h3>
+                    <p class="feature-description">
+                        AI-powered quality assurance with automated validation and 
+                        confidence scoring for all insights and metrics.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🎯</div>
+                    <h3 class="feature-title">Quality Assurance</h3>
+                    <p class="feature-description">
+                        Real-time validation engine with intelligent recommendations 
+                        and automated quality checks.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">💾</div>
+                    <h3 class="feature-title">Secure Storage</h3>
+                    <p class="feature-description">
+                        Enterprise-grade encrypted data management with persistent 
+                        storage and GDPR-compliant handling.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🔒</div>
+                    <h3 class="feature-title">Enterprise Security</h3>
+                    <p class="feature-description">
+                        Advanced security controls with role-based access, audit trails, 
+                        and comprehensive compliance features.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Demo Section -->
+            <section style="text-align: center; margin: 3rem 0;">
+                <h2 style="color: #004F4D; margin-bottom: 1rem;">Experience the Power</h2>
+                <p style="color: #4A4A4A; margin-bottom: 2rem;">
+                    See how our AI-powered platform transforms retail data into actionable business intelligence.
+                </p>
+                <div id="dashboard-container" style="display: none;">
+                    <!-- Dashboard components will be loaded here -->
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>© 2025 Retail Intelligence Dashboard. All rights reserved.</p>
+            <p>Powered by advanced AI technology for retail analytics excellence.</p>
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        // Client Sanitizer - Auto-initialize
+        (function() {
+            // Hide loading screen after content loads
+            window.addEventListener('load', function() {
+                setTimeout(function() {
+                    document.getElementById('loadingScreen').style.display = 'none';
+                    document.getElementById('app').style.display = 'block';
+                }, 500);
+            });
+
+            // Initialize client-safe environment
+            if (window.location.hostname !== 'localhost') {
+                // Disable debugging in production
+                console.debug = function() {};
+                console.info = function() {};
+                
+                // Sanitize console output
+                const originalLog = console.log;
+                console.log = function(...args) {
+                    const sanitized = args.map(arg => 
+                        typeof arg === 'string' ? 
+                        arg.replace(/Platform/g, 'System')
+                           .replace(/Agent/g, 'Assistant')
+                           .replace(/Memory/g, 'Cache') : arg
+                    );
+                    originalLog(...sanitized);
+                };
+
+                // Disable right-click in production
+                document.addEventListener('contextmenu', function(e) {
+                    e.preventDefault();
+                });
+
+                // Disable dev tools shortcuts
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'F12' || 
+                        (e.ctrlKey && e.shiftKey && e.key === 'I') ||
+                        (e.ctrlKey && e.shiftKey && e.key === 'C') ||
+                        (e.ctrlKey && e.key === 'u')) {
+                        e.preventDefault();
+                    }
+                });
+            }
+        })();
+
+        // Dashboard initialization
+        function initializeDashboard() {
+            const container = document.getElementById('dashboard-container');
+            container.style.display = 'block';
+            container.innerHTML = `
+                <div style="padding: 2rem; background: #FFFFFF; border: 1px solid #E0E0E0; border-radius: 8px; margin: 1rem 0;">
+                    <h3 style="color: #004F4D; margin-bottom: 1rem;">🚀 Dashboard Initializing...</h3>
+                    <p style="color: #4A4A4A;">
+                        Welcome to the Retail Intelligence Dashboard! 
+                        This demo showcases our AI-powered analytics platform with:
+                    </p>
+                    <ul style="text-align: left; color: #4A4A4A; max-width: 500px; margin: 1rem auto;">
+                        <li>Real-time data validation and quality checks</li>
+                        <li>Interactive AI learning assistant</li>
+                        <li>Automated insight generation</li>
+                        <li>Secure data management</li>
+                        <li>Export and reporting capabilities</li>
+                    </ul>
+                    <div style="margin-top: 2rem;">
+                        <div style="display: inline-block; padding: 1rem; background: #F8F9FA; border-radius: 6px; margin: 0.5rem;">
+                            <strong style="color: #004F4D;">✅ SnowWhite Sanitized</strong><br>
+                            <small style="color: #757575;">Client-ready deployment</small>
+                        </div>
+                        <div style="display: inline-block; padding: 1rem; background: #F8F9FA; border-radius: 6px; margin: 0.5rem;">
+                            <strong style="color: #004F4D;">🤖 AI-Powered</strong><br>
+                            <small style="color: #757575;">Advanced analytics engine</small>
+                        </div>
+                        <div style="display: inline-block; padding: 1rem; background: #F8F9FA; border-radius: 6px; margin: 0.5rem;">
+                            <strong style="color: #004F4D;">🔒 Enterprise Ready</strong><br>
+                            <small style="color: #757575;">Security & compliance</small>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Scroll to dashboard
+            container.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Performance monitoring
+        window.addEventListener('load', function() {
+            if ('performance' in window) {
+                const loadTime = Math.round(window.performance.timing.loadEventEnd - window.performance.timing.navigationStart);
+                console.log('✅ Dashboard loaded in ' + loadTime + 'ms');
+            }
+        });
+    </script>
+
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "Retail Intelligence Dashboard",
+        "description": "AI-powered retail analytics and insights platform",
+        "applicationCategory": "BusinessApplication",
+        "operatingSystem": "Web",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+        },
+        "creator": {
+            "@type": "Organization",
+            "name": "Retail Intelligence Platform"
+        }
+    }
+    </script>
+</body>
+</html>

@@ -1,0 +1,262 @@
+/* SnowWhite Client Theme - Neutral Retail Intelligence Branding */
+
+:root {
+  /* Primary Brand Colors - Professional & Neutral */
+  --primary-color: #004F4D;
+  --primary-light: #2C7A76;
+  --primary-dark: #003330;
+  
+  /* Accent Colors - Subtle & Professional */
+  --accent-color: #99C2B1;
+  --accent-light: #B8D4C6;
+  --accent-dark: #7AB09C;
+  
+  /* Neutral Palette */
+  --background-primary: #FAFAFA;
+  --background-secondary: #FFFFFF;
+  --background-tertiary: #F5F5F5;
+  
+  /* Text Colors */
+  --text-primary: #1A1A1A;
+  --text-secondary: #4A4A4A;
+  --text-muted: #757575;
+  --text-inverse: #FFFFFF;
+  
+  /* Status Colors - Muted */
+  --success: #2E7D32;
+  --warning: #F57C00;
+  --error: #C62828;
+  --info: #0277BD;
+  
+  /* Border & Shadow */
+  --border-color: #E0E0E0;
+  --border-light: #F0F0F0;
+  --shadow-light: 0 2px 4px rgba(0,0,0,0.1);
+  --shadow-medium: 0 4px 8px rgba(0,0,0,0.12);
+  
+  /* Typography */
+  --font-family-primary: "Segoe UI", "Roboto", "Helvetica Neue", Arial, sans-serif;
+  --font-family-mono: "SF Mono", "Monaco", "Consolas", monospace;
+  
+  /* Component Spacing */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+}
+
+/* Global Base Styles */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--background-primary);
+  color: var(--text-primary);
+  font-family: var(--font-family-primary);
+  line-height: 1.6;
+  margin: 0;
+  padding: 0;
+}
+
+/* Client-Safe Component Overrides */
+.ai-assistant-panel {
+  background: var(--background-secondary);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-medium);
+}
+
+.insight-card {
+  background: var(--background-secondary);
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  box-shadow: var(--shadow-light);
+}
+
+.insight-card:hover {
+  box-shadow: var(--shadow-medium);
+  border-color: var(--accent-color);
+}
+
+.validation-indicator.validated {
+  background: var(--success);
+  color: var(--text-inverse);
+}
+
+.validation-indicator.warning {
+  background: var(--warning);
+  color: var(--text-inverse);
+}
+
+.validation-indicator.error {
+  background: var(--error);
+  color: var(--text-inverse);
+}
+
+/* Navigation & Header */
+.dashboard-header {
+  background: var(--background-secondary);
+  border-bottom: 1px solid var(--border-color);
+  padding: var(--spacing-md);
+}
+
+.logo-container {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--primary-color);
+}
+
+/* Button Styles */
+.btn-primary {
+  background: var(--primary-color);
+  color: var(--text-inverse);
+  border: none;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: 6px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+  background: var(--primary-dark);
+}
+
+.btn-secondary {
+  background: var(--accent-color);
+  color: var(--text-primary);
+  border: none;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: 6px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+  background: var(--accent-dark);
+}
+
+/* Form Elements */
+input, textarea, select {
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: var(--spacing-sm);
+  font-family: inherit;
+  font-size: 0.9rem;
+  background: var(--background-secondary);
+  color: var(--text-primary);
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(0, 79, 77, 0.1);
+}
+
+/* Metric & Chart Components */
+.metric-value {
+  font-size: 2rem;
+  font-weight: 600;
+  color: var(--primary-color);
+}
+
+.metric-change.positive {
+  color: var(--success);
+}
+
+.metric-change.negative {
+  color: var(--error);
+}
+
+.metric-change.neutral {
+  color: var(--text-muted);
+}
+
+/* Loading States */
+.loading-spinner {
+  border: 2px solid var(--border-light);
+  border-top: 2px solid var(--primary-color);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Tooltip & Popover */
+.tooltip {
+  background: var(--text-primary);
+  color: var(--text-inverse);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: 4px;
+  font-size: 0.85rem;
+  box-shadow: var(--shadow-medium);
+}
+
+/* Footer */
+.dashboard-footer {
+  background: var(--background-tertiary);
+  border-top: 1px solid var(--border-color);
+  padding: var(--spacing-md);
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .dashboard-header {
+    padding: var(--spacing-sm);
+  }
+  
+  .insight-card {
+    margin-bottom: var(--spacing-sm);
+  }
+  
+  .metric-value {
+    font-size: 1.5rem;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .ai-assistant-panel,
+  .debug-panel,
+  .development-tools {
+    display: none !important;
+  }
+  
+  body {
+    background: white;
+    color: black;
+  }
+  
+  .insight-card {
+    border: 1px solid #ccc;
+    box-shadow: none;
+    page-break-inside: avoid;
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+  :root {
+    --primary-color: #000000;
+    --text-primary: #000000;
+    --background-primary: #FFFFFF;
+    --border-color: #000000;
+  }
+}
