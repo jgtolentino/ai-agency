@@ -1,0 +1,80 @@
+{
+  "name": "ai-agency-canonical",
+  "version": "2.1.0",
+  "description": "Canonical AI Agent Runtime with full interaction stack parity",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "setup": "./scripts/setup.sh",
+    "sync": "./scripts/sync_agents.sh",
+    "deploy": "./scripts/deploy_agents.sh",
+    "test": "jest",
+    "lint": "eslint . --ext .ts,.tsx",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist build",
+    "start": "node dist/index.js"
+  },
+  "keywords": [
+    "ai",
+    "agents",
+    "rag",
+    "validation",
+    "qa",
+    "learnbot",
+    "retailbot",
+    "vibe-testbot",
+    "supabase",
+    "memory",
+    "chat"
+  ],
+  "author": "TBWA InsightPulseAI",
+  "license": "MIT",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0",
+    "eslint": "^8.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "jest": "^29.0.0",
+    "@types/jest": "^29.0.0"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jgtolentino/ai-agency.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jgtolentino/ai-agency/issues"
+  },
+  "homepage": "https://github.com/jgtolentino/ai-agency#readme",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "dist",
+    "agents",
+    "components", 
+    "utils",
+    "config",
+    "scripts",
+    "README.md",
+    "package.json",
+    ".pulserrc",
+    "agent_manifest.yaml"
+  ]
+}

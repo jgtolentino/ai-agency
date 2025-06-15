@@ -1,0 +1,274 @@
+# AI Agency Dashboard Configuration
+# Full AI interaction stack with LearnBot RAG, RetailBot validation, and Vibe TestBot QA
+
+dashboard_config:
+  version: "2.1.0"
+  name: "AI Agency Interaction Stack"
+  description: "Unified AI assistant platform with RAG, validation, and QA capabilities"
+  
+  # AI Assistant Panel Configuration
+  ai_assistant:
+    enabled: true
+    floating_panel: true
+    default_agent: "learnbot"
+    position: "bottom-right"
+    size: "medium"
+    theme: "modern"
+    
+    # Available agents
+    agents:
+      learnbot:
+        name: "LearnBot"
+        version: "2.1"
+        description: "Interactive learning assistant with RAG"
+        icon: "🧠"
+        color: "#3B82F6"
+        features:
+          - rag_integration
+          - chat_memory
+          - contextual_tips
+          - tutorial_mode
+        config:
+          rag_enabled: true
+          knowledge_base: "scout_analytics"
+          memory_retention: 30 # days
+          max_chat_history: 100
+          response_style: "conversational"
+          
+      retailbot:
+        name: "RetailBot" 
+        version: "3.0"
+        description: "Retail analytics validator and insights"
+        icon: "🛒"
+        color: "#10B981"
+        features:
+          - insight_validation
+          - data_quality_checks
+          - business_logic_validation
+          - performance_recommendations
+        config:
+          validation_enabled: true
+          confidence_threshold: 0.7
+          auto_validate: true
+          suggestion_limit: 3
+          
+      vibe_testbot:
+        name: "Vibe TestBot"
+        version: "1.2" 
+        description: "AI-powered development QA"
+        icon: "🎯"
+        color: "#8B5CF6"
+        features:
+          - code_analysis
+          - real_time_qa
+          - fix_suggestions
+          - performance_monitoring
+          - tiktok_style_feedback
+        config:
+          dev_mode: true
+          real_time_enabled: true
+          watch_patterns: ["**/*.{ts,tsx,js,jsx}"]
+          exclude_patterns: ["node_modules/**", "dist/**"]
+          vibe_scoring: true
+
+  # Memory & Storage Configuration
+  memory:
+    provider: "supabase"
+    encryption_enabled: true
+    retention_policy: 30 # days
+    max_storage_mb: 100
+    chat_logging: true
+    
+    supabase:
+      url: "${NEXT_PUBLIC_SUPABASE_URL}"
+      key: "${NEXT_PUBLIC_SUPABASE_ANON_KEY}"
+      tables:
+        memory: "ai_memory"
+        chat_messages: "chat_messages"
+        chat_sessions: "chat_sessions"
+        
+  # UI Components Configuration
+  components:
+    learnbot_tooltip:
+      enabled: true
+      trigger_on: ["hover", "click"]
+      position: "auto"
+      show_confidence: true
+      chat_mode: true
+      animation: "fade"
+      
+    insight_card:
+      validation_enabled: true
+      show_confidence: true
+      auto_validate: true
+      retailbot_integration: true
+      alternative_views: true
+      
+    vibe_testbot_panel:
+      enabled: true
+      mode: "floating"
+      real_time: true
+      tiktok_style: true
+      performance_monitoring: true
+
+  # Integration Settings
+  integrations:
+    scout_dashboard:
+      enabled: true
+      agents: ["learnbot", "retailbot", "vibe_testbot"]
+      features: ["floating_panel", "insight_validation", "code_qa"]
+      
+    ces_platform:
+      enabled: true
+      agents: ["learnbot", "cesai"]
+      features: ["floating_panel", "campaign_analysis"]
+      
+    development_environment:
+      enabled: true
+      agents: ["vibe_testbot", "learnbot"] 
+      features: ["real_time_qa", "code_assistance"]
+
+  # Performance & Monitoring
+  performance:
+    enable_monitoring: true
+    metrics:
+      - response_time
+      - memory_usage
+      - user_interactions
+      - validation_accuracy
+      - code_quality_scores
+    
+    thresholds:
+      response_time_ms: 2000
+      memory_usage_mb: 50
+      validation_confidence: 0.8
+      code_quality_score: 80
+
+  # Security Configuration
+  security:
+    authentication_required: false
+    rate_limiting:
+      enabled: true
+      requests_per_minute: 100
+      burst_limit: 20
+    
+    data_privacy:
+      encrypt_memory: true
+      anonymize_logs: true
+      retention_policy: 30
+      gdpr_compliant: true
+
+  # Feature Flags
+  features:
+    learnbot_rag: true
+    retailbot_validation: true
+    vibe_testbot_qa: true
+    chat_memory: true
+    real_time_updates: true
+    performance_monitoring: true
+    tiktok_style_feedback: true
+    multi_agent_orchestration: true
+
+  # Development Options
+  development:
+    debug_mode: false
+    verbose_logging: false
+    mock_data: false
+    test_mode: false
+    hot_reload: true
+
+# Agent Orchestration Rules
+orchestration:
+  rules:
+    - name: "LearnBot Context Switch"
+      trigger: "user_asks_question"
+      action: "activate_learnbot_with_context"
+      priority: "high"
+      
+    - name: "RetailBot Auto Validation" 
+      trigger: "insight_card_render"
+      action: "validate_with_retailbot"
+      priority: "medium"
+      
+    - name: "Vibe TestBot Code Analysis"
+      trigger: "file_save"
+      action: "analyze_code_quality"
+      priority: "low"
+      condition: "development_mode"
+
+  workflows:
+    user_onboarding:
+      - step: "activate_learnbot"
+      - step: "show_dashboard_tour"
+      - step: "demonstrate_features"
+      
+    insight_creation:
+      - step: "render_insight_card"
+      - step: "validate_with_retailbot"
+      - step: "show_confidence_score"
+      - step: "provide_suggestions"
+      
+    development_qa:
+      - step: "monitor_code_changes"
+      - step: "analyze_with_vibe_testbot"
+      - step: "show_quality_score"
+      - step: "suggest_improvements"
+
+# Deployment Configuration
+deployment:
+  environments:
+    development:
+      debug_mode: true
+      mock_data: true
+      all_features_enabled: true
+      
+    staging:
+      debug_mode: false
+      mock_data: false
+      performance_monitoring: true
+      
+    production:
+      debug_mode: false
+      mock_data: false
+      performance_monitoring: true
+      security_hardening: true
+
+# Analytics & Reporting
+analytics:
+  enabled: true
+  events:
+    - agent_interactions
+    - validation_results
+    - code_quality_improvements
+    - user_engagement
+    - performance_metrics
+  
+  dashboards:
+    - name: "Agent Performance"
+      metrics: ["response_time", "accuracy", "user_satisfaction"]
+    - name: "Code Quality Trends"
+      metrics: ["quality_scores", "issues_found", "fixes_applied"]
+    - name: "User Engagement"
+      metrics: ["session_duration", "feature_usage", "return_rate"]
+
+# Version Control & Updates
+version_control:
+  auto_update: true
+  update_channel: "stable"
+  backup_configs: true
+  rollback_enabled: true
+  
+# Documentation Links
+documentation:
+  learnbot_guide: "/docs/learnbot-rag-integration"
+  retailbot_validation: "/docs/retailbot-insight-validation"
+  vibe_testbot_qa: "/docs/vibe-testbot-development-qa"
+  api_reference: "/docs/ai-agency-api"
+  troubleshooting: "/docs/troubleshooting"
+
+# Last Updated
+metadata:
+  last_updated: "2025-06-15T12:00:00Z"
+  config_version: "2.1.0"
+  compatibility: "ai-agency-canonical>=2.0.0"
+  maintainer: "InsightPulseAI Team"
