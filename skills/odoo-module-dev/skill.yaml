@@ -56,9 +56,32 @@ deliverables:
   - "Pre-commit configuration and CI/CD integration"
 
 cross_references:
-  - deep_research_skill: ~/.cline/skills/odoo/deep-research-oca/
-  - sample_module: ~/custom_addons/sc_demo/
-  - docker_runtime: ~/infra/odoo/
+  sample_module:
+    path: ~/custom_addons/sc_demo/
+    purpose: "Reference implementation - minimal OCA-compliant module"
+    structure:
+      __manifest__.py: "Odoo 16.0.1.0.0, LGPL-3, minimal metadata"
+      __init__.py: "Module initialization"
+      models/: "Python model definitions"
+      security/ir.model.access.csv: "CRUD permissions"
+      data/: "XML/CSV data files"
+    relationship: "This skill EXTENDS sc_demo with full OCA patterns (tests, migrations, pre-commit hooks)"
+    when_to_use_sc_demo: "Quick scaffolding, learning module structure, simple prototypes"
+    when_to_use_this_skill: "Production modules, OCA compliance, CI/CD integration, full testing"
+
+  deep_research_skill:
+    path: ~/.cline/skills/odoo/deep-research-oca/
+    purpose: "Manual deep-dive research workflow for OCA patterns"
+    relationship: "Provides interactive research; auto_research.py automates daily queries"
+
+  docker_runtime:
+    path: ~/infra/odoo/
+    purpose: "Docker runtime for testing generated modules"
+    usage: "Mount generated addon as volume: -v ./generated_addon:/mnt/extra-addons/generated_addon"
+
+  integration_docs:
+    comparison: knowledge/integration/module_patterns_comparison.md
+    migration_guide: "See comparison doc for upgrading sc_demo to production patterns"
 
 model_routing:
   default: deepseek/deepseek-v3.1

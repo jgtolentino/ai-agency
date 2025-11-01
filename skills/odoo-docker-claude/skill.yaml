@@ -52,9 +52,31 @@ deliverables:
   - "infra/odoo/.env.example (environment variable template)"
 
 cross_references:
-  - existing_infrastructure: ~/infra/odoo/
-  - sample_addons: ~/custom_addons/sc_demo/
-  - deployment_constraints: See CLAUDE.md for DigitalOcean App Platform usage
+  existing_infrastructure:
+    path: ~/infra/odoo/
+    purpose: "Baseline Docker setup - reference implementation"
+    files:
+      - Dockerfile: "Simple python:3.11-slim setup with Odoo 16.0"
+      - docker-compose.yml: "Basic Odoo + PostgreSQL orchestration"
+      - odoo.conf: "Runtime configuration template"
+      - requirements.txt: "Python deps including anthropic==0.36.0"
+    relationship: "This skill EXTENDS existing with multi-stage builds, security hardening, and supply chain validation"
+    when_to_use_existing: "Local development, quick prototyping, learning"
+    when_to_use_this_skill: "Production deployments, security compliance, CI/CD integration"
+
+  sample_addons:
+    path: ~/custom_addons/sc_demo/
+    purpose: "Minimal OCA module for testing Docker volume mounts"
+    relationship: "Mount as /mnt/extra-addons for validation"
+
+  integration_docs:
+    comparison: knowledge/integration/docker_comparison.md
+    migration_guide: "See comparison doc for upgrade path from simple to production-grade"
+
+  deployment_constraints:
+    platform: "DigitalOcean App Platform (see CLAUDE.md)"
+    prohibited: "Local docker build for production (use DO remote builds)"
+    allowed: "Docker for local debug ONLY"
 
 supply_chain_security:
   - non_root_user: true
