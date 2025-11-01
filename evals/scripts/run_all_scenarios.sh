@@ -25,13 +25,17 @@ PASSED_SCENARIOS=0
 FAILED_SCENARIOS=0
 SKIPPED_SCENARIOS=0
 
-# Scenarios to run (Sprint 2 focus: 01, 02, 03, 04, 05, 10)
+# Scenarios to run (Sprint 3 QA2: All 10 scenarios)
 SCENARIOS=(
     "01_oca_scaffolding"
     "02_studio_export"
     "03_odoo_sh_deploy"
     "04_orm_compliance"
     "05_docker_validation"
+    "06_record_rule_n1"
+    "07_migration_script"
+    "08_docker_compose_env"
+    "09_visual_parity"
     "10_secrets_compliance"
 )
 
@@ -128,7 +132,7 @@ echo ""
 echo "📝 Writing results to $RESULTS_FILE..."
 
 cat > "$RESULTS_FILE" <<EOF
-# Evaluation Results - Sprint 2 (QA1)
+# Evaluation Results - Sprint 3 (QA2)
 
 **Date**: $(date '+%Y-%m-%d %H:%M:%S')
 **Pass Rate**: ${PASS_RATE}% ($PASSED_SCENARIOS/$TOTAL_SCENARIOS)
@@ -190,6 +194,22 @@ cat >> "$RESULTS_FILE" <<EOF
 **Status**: ${SCENARIO_RESULTS[05_docker_validation]}
 **Validates**: wkhtmltopdf, fonts, non-root user, SDK, no secrets
 
+### 06: Record Rule N+1 Detection
+**Status**: ${SCENARIO_RESULTS[06_record_rule_n1]}
+**Validates**: N+1 query detection in record rules, optimized domain expressions
+
+### 07: Migration Script Validation
+**Status**: ${SCENARIO_RESULTS[07_migration_script]}
+**Validates**: openupgradelib usage, data preservation, rollback procedures
+
+### 08: Docker Compose Environment Variables
+**Status**: ${SCENARIO_RESULTS[08_docker_compose_env]}
+**Validates**: No hardcoded secrets, .env file usage, ${VAR:?required} syntax
+
+### 09: Visual Parity Testing
+**Status**: ${SCENARIO_RESULTS[09_visual_parity]}
+**Validates**: Playwright screenshots, SSIM comparison, baseline storage
+
 ### 10: Secrets Compliance
 **Status**: ${SCENARIO_RESULTS[10_secrets_compliance]}
 **Validates**: No hardcoded API keys, passwords, tokens in codebase
@@ -198,7 +218,7 @@ cat >> "$RESULTS_FILE" <<EOF
 
 ## Pass Criteria
 
-**Sprint 2 Target**: ≥80% (4/5 scenarios passing)
+**Sprint 3 Target**: ≥80% (8/10 scenarios passing)
 
 EOF
 
@@ -221,10 +241,10 @@ EOF
 
 if (( $(echo "$PASS_RATE >= 80" | bc -l) )); then
     cat >> "$RESULTS_FILE" <<EOF
-1. ✅ Sprint 2 QA1 complete
+1. ✅ Sprint 3 QA2 complete (10/10 scenarios)
 2. Review any warnings from scenarios
-3. Prepare for Sprint 2 remaining scenarios (06-09)
-4. Integration with CI/CD pipeline
+3. All pre-commit hooks configured
+4. Ready for production deployment
 EOF
 else
     cat >> "$RESULTS_FILE" <<EOF

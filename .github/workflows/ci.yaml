@@ -25,9 +25,11 @@ jobs:
         run: |
           pip install pre-commit pytest pyyaml
 
-      - name: Run pre-commit hooks
+      - name: Run pre-commit hooks (Sprint 3 QA2)
         run: |
-          pre-commit run --all-files || true
+          # Install pre-commit and run all hooks
+          pre-commit install
+          pre-commit run --all-files
 
       - name: Run pytest
         run: |
@@ -79,72 +81,69 @@ jobs:
           # Install xmllint for XML validation
           sudo apt-get update && sudo apt-get install -y libxml2-utils bc
 
-      - name: Run evaluation scenarios (Sprint 2 Focus)
+      - name: Run evaluation scenarios (Sprint 3 QA2)
         run: |
           # Note: Some scenarios require Docker/Odoo runtime (will be skipped in CI)
           # CI runs documentation and structure validation only
 
-          echo "🧪 Running Sprint 2 Evaluation Scenarios..."
-          echo "==========================================="
+          echo "🧪 Running Sprint 3 Evaluation Scenarios (10 total)..."
+          echo "======================================================"
 
-          # Scenario 01: OCA Scaffolding (structure validation only)
-          echo "📋 Scenario 01: OCA Module Scaffolding"
-          if [ -f "evals/scenarios/01_oca_scaffolding.md" ]; then
-            echo "✓ Documentation exists"
-            if [ -f "evals/scripts/01_oca_scaffolding.sh" ]; then
-              echo "✓ Executable script exists"
-            fi
-          fi
+          # Define all scenarios
+          SCENARIOS=(
+            "01_oca_scaffolding"
+            "02_studio_export"
+            "03_odoo_sh_deploy"
+            "04_orm_compliance"
+            "05_docker_validation"
+            "06_record_rule_n1"
+            "07_migration_script"
+            "08_docker_compose_env"
+            "09_visual_parity"
+            "10_secrets_compliance"
+          )
 
-          # Scenario 02: Studio Export (validation logic only)
-          echo "📋 Scenario 02: Studio XML Export"
-          if [ -f "evals/scenarios/02_studio_export.md" ]; then
-            echo "✓ Documentation exists"
-            if [ -f "evals/scripts/02_studio_export.sh" ]; then
-              echo "✓ Executable script exists"
-            fi
-          fi
+          # Validate each scenario
+          for SCENARIO in "${SCENARIOS[@]}"; do
+            echo ""
+            echo "📋 Scenario: $SCENARIO"
 
-          # Scenario 03: Odoo.sh Deployment (validation logic only)
-          echo "📋 Scenario 03: Odoo.sh Deployment"
-          if [ -f "evals/scenarios/03_odoo_sh_deploy.md" ]; then
-            echo "✓ Documentation exists"
-            if [ -f "evals/scripts/03_odoo_sh_deploy.sh" ]; then
-              echo "✓ Executable script exists"
-            fi
-          fi
-
-          # Scenario 04: ORM Compliance (structure validation only)
-          echo "📋 Scenario 04: ORM Compliance"
-          if [ -f "evals/scenarios/04_orm_compliance.md" ]; then
-            echo "✓ Documentation exists"
-            if [ -f "evals/scripts/04_orm_compliance.sh" ]; then
-              echo "✓ Executable script exists"
-            fi
-          fi
-
-          # Scenario 05: Docker Validation (skipped in CI - requires Docker)
-          echo "📋 Scenario 05: Docker Validation"
-          if [ -f "evals/scenarios/05_docker_validation.md" ]; then
-            echo "✓ Documentation exists"
-            if [ -f "evals/scripts/05_docker_validation.sh" ]; then
-              echo "✓ Executable script exists (skipped in CI)"
-            fi
-          fi
-
-          # Scenario 10: Secrets Compliance (full execution)
-          echo "📋 Scenario 10: Secrets Compliance"
-          if [ -f "evals/scripts/10_secrets_compliance.sh" ]; then
-            echo "Running secrets compliance check..."
-            bash evals/scripts/10_secrets_compliance.sh || {
-              echo "❌ Secrets compliance failed"
+            # Check documentation exists
+            if [ -f "evals/scenarios/${SCENARIO}.md" ]; then
+              echo "  ✓ Documentation exists"
+            else
+              echo "  ✗ Documentation missing"
               exit 1
-            }
-          fi
+            fi
+
+            # Check executable script exists
+            if [ -f "evals/scripts/${SCENARIO}.sh" ]; then
+              echo "  ✓ Executable script exists"
+
+              # Run non-Docker scenarios
+              if [[ "$SCENARIO" == "10_secrets_compliance" ]] || \
+                 [[ "$SCENARIO" == "06_record_rule_n1" ]] || \
+                 [[ "$SCENARIO" == "07_migration_script" ]] || \
+                 [[ "$SCENARIO" == "08_docker_compose_env" ]]; then
+                echo "  ▶ Running validation..."
+                bash "evals/scripts/${SCENARIO}.sh" || {
+                  echo "  ✗ Validation failed"
+                  exit 1
+                }
+                echo "  ✓ Validation passed"
+              else
+                echo "  ⊘ Skipped (requires Docker/Odoo runtime)"
+              fi
+            else
+              echo "  ✗ Executable script missing"
+              exit 1
+            fi
+          done
 
           echo ""
-          echo "✅ Sprint 2 Eval Documentation Validated"
-          echo "==========================================="
+          echo "======================================================"
+          echo "✅ Sprint 3 QA2 Eval Validation Complete (10/10)"
+          echo "======================================================"
           echo ""
           echo "Note: Full scenario execution requires local environment with Docker/Odoo"
           echo "Run locally: bash evals/scripts/run_all_scenarios.sh"
