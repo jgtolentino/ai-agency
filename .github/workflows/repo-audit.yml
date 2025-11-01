@@ -29,7 +29,7 @@ jobs:
           for f in Dockerfile docker-compose*.yml .pre-commit-config.yaml odoo.conf; do
             if [ -f "$f" ]; then echo "\n\nCODE[$f]\n" >> .audit/in/files.txt; sed -n "1,400p" "$f" >> .audit/in/files.txt; echo "\nENDCODE\n" >> .audit/in/files.txt; fi
           done
-          find .github/workflows -type f -name "*.yml" -maxdepth 2 -print0 2>/dev/null | xargs -0 -I{} sh -c 'echo "\n\nCODE[{}]\n"; sed -n "1,400p" "{}"; echo "\nENDCODE\n"' >> .audit/in/files.txt || true
+          find .github/workflows -maxdepth 2 -type f -name "*.yml" -print0 2>/dev/null | xargs -0 -I{} sh -c 'echo "\n\nCODE[{}]\n"; sed -n "1,400p" "{}"; echo "\nENDCODE\n"' >> .audit/in/files.txt || true
           find infra -type f \( -name "*.tf" -o -name "*.yml" -o -name "*.yaml" \) 2>/dev/null | head -n 50 | xargs -I{} sh -c 'echo "\n\nCODE[{}]\n"; sed -n "1,400p" "{}"; echo "\nENDCODE\n"' >> .audit/in/files.txt || true
 
       - name: Setup Node.js

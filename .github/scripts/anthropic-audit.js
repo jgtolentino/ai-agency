@@ -27,15 +27,14 @@ Keep findings <= 40. Provide concrete fixes.`;
     headers: {
       "x-api-key": apiKey,
       "anthropic-version": "2023-06-01",
+      "anthropic-beta": "messages-2024-10-22,skills-2024-10-22",
       "content-type": "application/json"
     },
     body: JSON.stringify({
       model,
       system,
       max_tokens: 8000,
-      messages: [{ role: "user", content: user }],
-      // Helpful hint so the model discovers Skills
-      extra_headers: { "anthropic-beta": "messages-2024-10-22,skills-2024-10-22" }
+      messages: [{ role: "user", content: user }]
     })
   });
 
