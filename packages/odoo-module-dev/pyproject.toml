@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "odoo-agent-module-dev"
+version = "0.1.0"
+description = "OCA-compliant Odoo module development agent"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "Apache-2.0"}
+authors = [
+    {name = "AI Agency Team"}
+]
+keywords = ["odoo", "ai", "agent", "oca", "module"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+
+dependencies = [
+    "odoo-agent-core>=0.1.0",
+    "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-asyncio>=0.21",
+    "pre-commit>=3.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/jgtolentino/ai-agency"
+Repository = "https://github.com/jgtolentino/ai-agency"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["odoo_agent_module_dev*"]
