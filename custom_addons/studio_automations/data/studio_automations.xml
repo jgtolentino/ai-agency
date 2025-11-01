@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2025 Odoo Community Association (OCA) -->
+<!-- License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl-3.0). -->
+<odoo>
+    <data noupdate="1">
+        <!-- Automation 1: Deploy Request Approval Workflow -->
+        <record id="auto_action_deploy_approved" model="base.automation">
+            <field name="name">Deploy: On Approved → Dispatch Git-Ops</field>
+            <field name="model_id" ref="project.model_project_task"/>
+            <field name="trigger">on_write</field>
+            <field name="filter_pre_domain">[('stage_id.name', '!=', 'Approved')]</field>
+            <field name="filter_domain">[('stage_id.name', '=', 'Approved')]</field>
+            <field name="state">code</field>
+            <field name="code"><![CDATA[
+# Only process if task has deploy-related fields (custom fields assumed)
+if hasattr(record, 'x_deploy_type') and record.x_deploy_type == 'deploy':
+    # Get deploy branch or default to staging
+    deploy_branch = record.x_deploy_branch if hasattr(record, 'x_deploy_branch') and record.x_deploy_branch else 'staging'
+
+    # Create and execute pulser_webhook wizard
+    wizard = env['pulser.gitops.wizard'].create({
+        'branch': deploy_branch,
+        'message': 'Deploy: %s' % record.name,
+    })
+
+    try:
+        wizard.action_dispatch()
+
+        # Log success message on task
+        record.message_post(
+            body='✅ Deployment dispatched to %s via Git-Ops webhook' % deploy_branch,
+            subtype_id=env.ref('mail.mt_comment').id,
+        )
+
+        # Notify DevOps channel if exists
+        devops_channel = env.ref('studio_automations.channel_devops', raise_if_not_found=False)
+        if devops_channel:
+            devops_channel.message_post(
+                body='Deployment dispatched for task <a href="/web#id=%s&model=project.task">%s</a>' % (record.id, record.name),
+                subtype_id=env.ref('mail.mt_comment').id,
+            )
+    except Exception as e:
+        # Log error message on task
+        record.message_post(
+            body='❌ Deployment dispatch failed: %s' % str(e),
+            subtype_id=env.ref('mail.mt_comment').id,
+        )
+        raise
+]]></field>
+        </record>
+
+        <!-- Automation 2: Rollback on Health Check Failure -->
+        <record id="auto_action_rollback_on_fail" model="base.automation">
+            <field name="name">Deploy: On Health Check Fail → Rollback</field>
+            <field name="model_id" ref="project.model_project_task"/>
+            <field name="trigger">on_write</field>
+            <field name="filter_pre_domain">[('x_health_check_status', '!=', 'failed')]</field>
+            <field name="filter_domain">[('x_health_check_status', '=', 'failed')]</field>
+            <field name="state">code</field>
+            <field name="code"><![CDATA[
+# Only process if deployment state indicates active deployment
+if hasattr(record, 'x_deploy_state') and record.x_deploy_state == 'deployed':
+    # Set state to Rolled Back
+    if hasattr(record, 'x_deploy_state'):
+        record.write({'x_deploy_state': 'rolled_back'})
+
+    # Create SOP run for rollback
+    sop = env['qms.sop.document'].search([('code', '=', 'SOP-DEPLOY-001')], limit=1)
+    if sop:
+        run = env['qms.sop.run'].create({
+            'sop_id': sop.id,
+            'started_by': env.user.id,
+            'state': 'in_progress',
+            'result': 'Automatic rollback triggered by health check failure on task: %s' % record.name,
+        })
+
+        # Log SOP run creation on task
+        record.message_post(
+            body='🔄 SOP run created for rollback: <a href="/web#id=%s&model=qms.sop.run">%s</a>' % (run.id, run.sop_id.name),
+            subtype_id=env.ref('mail.mt_comment').id,
+        )
+
+    # Notify DevOps channel
+    devops_channel = env.ref('studio_automations.channel_devops', raise_if_not_found=False)
+    if devops_channel:
+        devops_channel.message_post(
+            body='⚠️ ROLLBACK triggered for task <a href="/web#id=%s&model=project.task">%s</a> - health check failed',
+            message_type='notification',
+            subtype_id=env.ref('mail.mt_comment').id,
+        )
+
+    # Log critical event
+    _logger.warning('Automatic rollback triggered for task %s (ID: %s) due to health check failure', record.name, record.id)
+]]></field>
+        </record>
+
+        <!-- Automation 3: Approval Requirement for Finance/HR Modules -->
+        <record id="auto_action_require_approval" model="base.automation">
+            <field name="name">Deploy: Finance/HR modules require approval</field>
+            <field name="model_id" ref="project.model_project_task"/>
+            <field name="trigger">on_create_or_write</field>
+            <field name="filter_domain">[
+                ('x_deploy_type', '=', 'deploy'),
+                '|',
+                ('x_affected_modules', 'ilike', 'account'),
+                ('x_affected_modules', 'ilike', 'hr'),
+                ('stage_id.name', '=', 'Ready for Review')
+            ]</field>
+            <field name="state">code</field>
+            <field name="code"><![CDATA[
+# Determine approval group based on affected modules
+affected_modules = record.x_affected_modules if hasattr(record, 'x_affected_modules') and record.x_affected_modules else ''
+
+approval_groups = []
+notification_message = []
+
+# Check for finance modules
+if 'account' in affected_modules.lower():
+    finance_group = env.ref('base.group_account_manager', raise_if_not_found=False)
+    if finance_group:
+        approval_groups.append(finance_group)
+        notification_message.append('Finance Manager')
+
+# Check for HR modules
+if 'hr' in affected_modules.lower():
+    hr_group = env.ref('base.group_hr_manager', raise_if_not_found=False)
+    if hr_group:
+        approval_groups.append(hr_group)
+        notification_message.append('HR Manager')
+
+# Subscribe approval groups as followers
+if approval_groups:
+    partner_ids = []
+    for group in approval_groups:
+        partner_ids.extend(group.users.mapped('partner_id').ids)
+
+    if partner_ids:
+        record.message_subscribe(partner_ids=partner_ids)
+
+    # Post notification on task
+    approval_text = ' and '.join(notification_message)
+    record.message_post(
+        body='⚠️ This deployment affects sensitive modules. %s approval required before deployment.' % approval_text,
+        subtype_id=env.ref('mail.mt_comment').id,
+    )
+
+    # Log info
+    _logger.info('Approval requirement set for task %s (ID: %s): %s', record.name, record.id, approval_text)
+]]></field>
+        </record>
+
+        <!-- DevOps Communication Channel (optional) -->
+        <record id="channel_devops" model="mail.channel">
+            <field name="name">DevOps Deployments</field>
+            <field name="channel_type">channel</field>
+            <field name="description">Automated deployment notifications and alerts</field>
+            <field name="group_public_id" ref="base.group_user"/>
+        </record>
+    </data>
+</odoo>

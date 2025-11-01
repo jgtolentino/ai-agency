@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright {{ year }} {{ author }} -->
+<!-- License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl-3.0). -->
+
+<odoo>
+
+{% if tree_view %}
+    <!-- Tree View -->
+    <record id="view_{{ model_safe }}_tree" model="ir.ui.view">
+        <field name="name">{{ model_name }}.tree</field>
+        <field name="model">{{ model_name }}</field>
+        <field name="arch" type="xml">
+            <tree string="{{ model_title }}">
+{% for field in tree_fields %}
+                <field name="{{ field.name }}"{{ ' optional="hide"' if field.optional }}/>
+{% endfor %}
+            </tree>
+        </field>
+    </record>
+
+{% endif %}
+{% if form_view %}
+    <!-- Form View -->
+    <record id="view_{{ model_safe }}_form" model="ir.ui.view">
+        <field name="name">{{ model_name }}.form</field>
+        <field name="model">{{ model_name }}</field>
+        <field name="arch" type="xml">
+            <form string="{{ model_title }}">
+                <header>
+{% if has_state_field %}
+                    <field name="state" widget="statusbar" statusbar_visible="{{ state_visible }}"/>
+{% endif %}
+                </header>
+                <sheet>
+{% if form_groups %}
+{% for group in form_groups %}
+                    <group name="{{ group.name }}" string="{{ group.title }}">
+{% for field in group.fields %}
+                        <field name="{{ field.name }}"{{ ' required="1"' if field.required }}{{ ' readonly="1"' if field.readonly }}/>
+{% endfor %}
+                    </group>
+{% endfor %}
+{% else %}
+                    <group>
+{% for field in form_fields %}
+                        <field name="{{ field.name }}"/>
+{% endfor %}
+                    </group>
+{% endif %}
+{% if has_notebook %}
+                    <notebook>
+{% for page in notebook_pages %}
+                        <page name="{{ page.name }}" string="{{ page.title }}">
+{% for field in page.fields %}
+                            <field name="{{ field.name }}"/>
+{% endfor %}
+                        </page>
+{% endfor %}
+                    </notebook>
+{% endif %}
+                </sheet>
+{% if has_chatter %}
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+{% endif %}
+            </form>
+        </field>
+    </record>
+
+{% endif %}
+{% if search_view %}
+    <!-- Search View -->
+    <record id="view_{{ model_safe }}_search" model="ir.ui.view">
+        <field name="name">{{ model_name }}.search</field>
+        <field name="model">{{ model_name }}</field>
+        <field name="arch" type="xml">
+            <search string="{{ model_title }}">
+{% for field in search_fields %}
+                <field name="{{ field.name }}"/>
+{% endfor %}
+{% if search_filters %}
+                <separator/>
+{% for filter in search_filters %}
+                <filter name="{{ filter.name }}" string="{{ filter.title }}" domain="{{ filter.domain }}"/>
+{% endfor %}
+{% endif %}
+{% if group_by %}
+                <group expand="0" string="Group By">
+{% for group in group_by %}
+                    <filter name="group_{{ group.name }}" string="{{ group.title }}" context="{{'group_by': '{{ group.name }}'}}"/>
+{% endfor %}
+                </group>
+{% endif %}
+            </search>
+        </field>
+    </record>
+
+{% endif %}
+    <!-- Action -->
+    <record id="action_{{ model_safe }}" model="ir.actions.act_window">
+        <field name="name">{{ model_title }}</field>
+        <field name="res_model">{{ model_name }}</field>
+        <field name="view_mode">{{ view_modes|join(',') }}</field>
+{% if context %}
+        <field name="context">{{ context }}</field>
+{% endif %}
+{% if domain %}
+        <field name="domain">{{ domain }}</field>
+{% endif %}
+{% if help_message %}
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                {{ help_message }}
+            </p>
+        </field>
+{% endif %}
+    </record>
+
+{% if menu_items %}
+{% for menu in menu_items %}
+    <!-- Menu -->
+    <menuitem
+        id="menu_{{ menu.id }}"
+        name="{{ menu.name }}"
+{% if menu.parent %}
+        parent="{{ menu.parent }}"
+{% endif %}
+{% if menu.action %}
+        action="{{ menu.action }}"
+{% endif %}
+{% if menu.sequence %}
+        sequence="{{ menu.sequence }}"
+{% endif %}
+    />
+{% endfor %}
+{% endif %}
+
+</odoo>

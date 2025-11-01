@@ -1,0 +1,66 @@
+# -*- coding: utf-8 -*-
+# Copyright {{ year }} {{ author }}
+# License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl-3.0).
+
+from odoo import api, fields, models, _
+from odoo.exceptions import UserError, ValidationError
+
+
+class {{ class_name }}(models.TransientModel):
+    """{{ wizard_description }}"""
+
+    _name = '{{ wizard_model }}'
+    _description = '{{ wizard_description }}'
+
+    # Fields
+{% for field in fields %}
+    {{ field.name }} = fields.{{ field.type }}(
+        string='{{ field.string }}',
+{% if field.required %}
+        required={{ field.required|lower }},
+{% endif %}
+{% if field.default %}
+        default={{ field.default }},
+{% endif %}
+{% if field.help %}
+        help='{{ field.help }}',
+{% endif %}
+{% if field.comodel_name %}
+        comodel_name='{{ field.comodel_name }}',
+{% endif %}
+{% if field.selection %}
+        selection={{ field.selection }},
+{% endif %}
+    )
+{% endfor %}
+
+    def {{ action_method }}(self):
+        """Execute wizard action"""
+        self.ensure_one()
+
+        # Get active records
+        active_ids = self.env.context.get('active_ids', [])
+        active_model = self.env.context.get('active_model')
+
+        if not active_ids or not active_model:
+            raise UserError(_('No records selected'))
+
+        records = self.env[active_model].browse(active_ids)
+
+        # TODO: Implement wizard logic
+{% for step in action_steps %}
+        # {{ step.description }}
+        {{ step.code }}
+{% endfor %}
+
+        return {
+            'type': 'ir.actions.act_window_close'
+        }
+
+{% if cancel_method %}
+    def action_cancel(self):
+        """Cancel wizard"""
+        return {
+            'type': 'ir.actions.act_window_close'
+        }
+{% endif %}

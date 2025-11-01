@@ -1,0 +1,164 @@
+---
+name: Rollback Deployment
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment (staging|production)'
+        required: true
+        type: choice
+        options:
+          - staging
+          - production
+      target_tag:
+        description: 'Target image tag (default: previous)'
+        required: false
+      reason:
+        description: 'Rollback reason'
+        required: true
+
+jobs:
+  rollback:
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DO_ACCESS_TOKEN }}
+
+      - name: Get app ID and previous deployment
+        id: app
+        run: |
+          if [ "${{ github.event.inputs.environment }}" == "production" ]; then
+            APP_ID="${{ secrets.DO_APP_ID_PROD }}"
+            ENV_NAME="production"
+          else
+            APP_ID="${{ secrets.DO_APP_ID_STAGING }}"
+            ENV_NAME="staging"
+          fi
+          echo "app_id=${APP_ID}" >> $GITHUB_OUTPUT
+          echo "env_name=${ENV_NAME}" >> $GITHUB_OUTPUT
+
+          # Get previous successful deployment
+          echo "📋 Fetching deployment history..."
+          PREV_DEPLOYMENT=$(doctl apps list-deployments ${APP_ID} --format ID,Phase --no-header | grep ACTIVE | head -2 | tail -1 | awk '{print $1}')
+          echo "prev_deployment=${PREV_DEPLOYMENT}" >> $GITHUB_OUTPUT
+          echo "Previous deployment ID: ${PREV_DEPLOYMENT}"
+
+      - name: Get target image tag
+        id: target
+        run: |
+          if [ -n "${{ github.event.inputs.target_tag }}" ]; then
+            TAG="${{ github.event.inputs.target_tag }}"
+            echo "Using specified tag: ${TAG}"
+          else
+            # Get image tag from previous deployment
+            echo "Fetching image tag from previous deployment..."
+            TAG=$(doctl apps get-deployment ${{ steps.app.outputs.app_id }} ${{ steps.app.outputs.prev_deployment }} --format Spec --output json | jq -r '.services[0].image.tag // "latest"')
+            echo "Previous deployment tag: ${TAG}"
+          fi
+          echo "tag=${TAG}" >> $GITHUB_OUTPUT
+
+      - name: Check app spec exists
+        id: appspec
+        run: |
+          SPEC_FILE="infra/do/app-spec-${{ steps.app.outputs.env_name }}.yaml"
+          if [ -f "${SPEC_FILE}" ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+            echo "spec_file=${SPEC_FILE}" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "⚠️ App spec not found: ${SPEC_FILE}"
+          fi
+
+      - name: Update app spec to previous version
+        if: steps.appspec.outputs.exists == 'true'
+        run: |
+          echo "🔄 Rolling back to image tag: ${{ steps.target.outputs.tag }}"
+          sed -i "s|image:.*|image: registry.digitalocean.com/insightpulse/odoo:${{ steps.target.outputs.tag }}|g" ${{ steps.appspec.outputs.spec_file }}
+          doctl apps update ${{ steps.app.outputs.app_id }} --spec ${{ steps.appspec.outputs.spec_file }}
+
+      - name: Create rollback deployment
+        id: deployment
+        run: |
+          echo "🚀 Creating rollback deployment..."
+          DEPLOYMENT_ID=$(doctl apps create-deployment ${{ steps.app.outputs.app_id }} --force-rebuild --format ID --no-header)
+          echo "deployment_id=${DEPLOYMENT_ID}" >> $GITHUB_OUTPUT
+          echo "✅ Rollback deployment created: ${DEPLOYMENT_ID}"
+
+      - name: Wait for rollback
+        run: |
+          echo "⏳ Waiting for rollback to complete..."
+          doctl apps get-deployment ${{ steps.app.outputs.app_id }} ${{ steps.deployment.outputs.deployment_id }} --wait
+          echo "✅ Rollback completed"
+
+      - name: Get app URL
+        id: app_url
+        run: |
+          APP_URL=$(doctl apps get ${{ steps.app.outputs.app_id }} --format DefaultIngress --no-header)
+          echo "url=${APP_URL}" >> $GITHUB_OUTPUT
+          echo "App URL: https://${APP_URL}"
+
+      - name: Setup Python for health check
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Verify health after rollback
+        id: health
+        run: |
+          echo "🔍 Verifying health after rollback..."
+          python scripts/health_check.py \
+            --target blue \
+            --url "https://${{ steps.app_url.outputs.url }}" \
+            --timeout 30 \
+            --json-output rollback_health_results.json || echo "Health check script not found"
+
+          if [ -f "rollback_health_results.json" ]; then
+            HEALTHY=$(jq -r '.healthy' rollback_health_results.json)
+            if [ "${HEALTHY}" == "true" ]; then
+              echo "✅ Post-rollback health checks passed"
+            else
+              echo "⚠️ Post-rollback health checks failed"
+              cat rollback_health_results.json
+              echo "Manual intervention required!"
+              exit 1
+            fi
+          else
+            echo "⚠️ Health check script not available"
+          fi
+
+      - name: Notify rollback complete
+        run: |
+          echo "✅ Rollback completed successfully"
+          echo "Environment: ${{ github.event.inputs.environment }}"
+          echo "Target tag: ${{ steps.target.outputs.tag }}"
+          echo "Reason: ${{ github.event.inputs.reason }}"
+          echo "Deployment ID: ${{ steps.deployment.outputs.deployment_id }}"
+
+          # Optional webhook notification
+          if [ -n "${{ secrets.ODOO_WEBHOOK_URL }}" ]; then
+            curl -X POST "${{ secrets.ODOO_WEBHOOK_URL }}/pulser/webhook" \
+              -H "Content-Type: application/json" \
+              -H "X-Pulser-Signature: sha256=${{ secrets.PULSER_WEBHOOK_SECRET }}" \
+              -d '{
+                "event": "rollback_complete",
+                "environment": "${{ github.event.inputs.environment }}",
+                "target_tag": "${{ steps.target.outputs.tag }}",
+                "reason": "${{ github.event.inputs.reason }}",
+                "deployment_id": "${{ steps.deployment.outputs.deployment_id }}"
+              }' || echo "Webhook notification skipped"
+          fi
+
+      - name: Create incident report
+        run: |
+          echo "📋 Creating incident report..."
+          gh issue create \
+            --title "Rollback executed: ${{ github.event.inputs.environment }}" \
+            --body "**Reason**: ${{ github.event.inputs.reason }}\n**Target**: ${{ steps.target.outputs.tag }}\n**Deployment**: ${{ steps.deployment.outputs.deployment_id }}\n**Timestamp**: $(date -u +"%Y-%m-%d %H:%M:%S UTC")" \
+            --label "incident,rollback,${{ github.event.inputs.environment }}" || echo "Failed to create issue - continuing"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -493,6 +493,419 @@ bash evals/scripts/01_oca_scaffolding.sh
 
 ---
 
+## PRD Integration Workflows
+
+### Workflow 5: Create Module with VS Code (5 minutes)
+
+**Scenario**: Generate OCA module using VS Code extension with automated documentation
+
+```bash
+# Step 1: Open Command Palette (Cmd+Shift+P / Ctrl+Shift+P)
+# Type: "Odoo: Scaffold Module"
+
+# Interactive prompts:
+Module Name: expense_approval
+Description: "Multi-level expense approval workflow"
+Models: "expense.approval:name,amount,state,approver_id,notes"
+Dependencies: "base,account,project"
+Author: (auto-filled from git config)
+License: LGPL-3
+
+# Expected: Module created in custom_addons/expense_approval/
+# - Complete OCA-compliant structure
+# - All models, views, security files
+# - Unit tests scaffolded
+# - README.rst auto-generated
+
+# Step 2: Validate OCA Compliance
+# Command Palette → "Odoo: Validate OCA"
+# Expected: Pre-commit runs all checks
+# - ruff (linting) ✅
+# - black (formatting) ✅
+# - isort (import sorting) ✅
+# - flake8 (style guide) ✅
+# - pylint-odoo (OCA-specific) ✅
+
+# Step 3: Generate Documentation
+# Command Palette → "Odoo: Generate Docs"
+# Optional: Enter ADR decision title (e.g., "Use state machine for approval flow")
+# Expected: Documentation created
+# - README.rst (OCA format, ~200 lines)
+# - CHANGELOG.md (Keep a Changelog format, ~150 lines)
+# - ADR-001-state-machine.md (if ADR requested, ~180 lines)
+
+# Step 4: Develop Features
+# Use devcontainer for consistent environment
+# Command Palette → "Dev Containers: Reopen in Container"
+# Expected: Container starts with Odoo 16.0 pre-installed (~30s after first build)
+
+# Access Odoo:
+# - Browser: http://localhost:8069
+# - Database: odoo
+# - Username: admin
+# - Password: admin
+
+# Step 5: Deploy to Staging
+# Command Palette → "Odoo: Deploy"
+# Select environment: staging
+# Image tag: latest (or specific SHA)
+# Expected: GitHub Actions triggered
+# - CI workflow runs (~8 min)
+# - Deployment to DigitalOcean (~8 min)
+# - Health checks pass ✅
+# - Total time: ~16 min
+```
+
+**Model Used**: DeepSeek v3.1 (scaffolding), GitHub Actions (deployment automation)
+**Cost**: ~$0.0001 (scaffolding only, deployment is free via CI)
+**Time Saved**: ~15 minutes vs manual module creation
+
+### Workflow 6: Git-Ops Deployment via Odoo UI (10 minutes)
+
+**Scenario**: Deploy module to production from Odoo Project task (non-technical user workflow)
+
+```bash
+# Step 1: Create Deployment Task in Odoo UI
+# Navigate to: Project → Tasks → Create
+Task fields:
+  - Name: "Deploy expense_approval v1.0.0 to production"
+  - Type: Deploy (custom task type)
+  - Branch: main
+  - Commit Message: "feat(expense): Add multi-level approval workflow"
+  - Environment: production
+  - Image Tag: 1.0.0
+  - State: Ready for Review
+
+# Step 2: Code Review Process
+# Assign to technical lead for review
+# Lead reviews:
+  - Code changes in PR
+  - Test coverage report (must be ≥75%)
+  - OCA validation status (must be green)
+  - Security scan results (no HIGH/CRITICAL vulnerabilities)
+
+# Step 3: Approval
+# Technical lead or project manager sets:
+  - State: Approved
+
+# Expected: Studio automation triggers immediately
+# Studio Automated Action:
+#   Model: project.task
+#   Trigger: State changes to "Approved"
+#   Condition: Type = "Deploy"
+#   Action: Execute pulser_webhook.action_dispatch()
+
+# Step 4: Git-Ops Dispatch
+# pulser_webhook module:
+  - Generates HMAC signature for security
+  - Calls GitHub API: repository_dispatch
+  - Event type: deploy
+  - Client payload:
+      branch: main
+      commit_message: "feat(expense): Add multi-level approval workflow"
+      task_id: 1234
+      environment: production
+      image_tag: 1.0.0
+      initiated_by: "Project Manager Name"
+
+# Step 5: GitHub Actions Execution
+# .github/workflows/deploy.yml triggered by repository_dispatch
+# Workflow steps:
+  1. Checkout code ✅
+  2. Update app spec with image tag ✅
+  3. Apply app spec to DigitalOcean ✅
+  4. Create deployment with force rebuild ✅
+  5. Monitor deployment progress (max 10 min) ✅
+  6. Run health check validation ✅
+  7. Decision:
+     - ✅ Health Check Pass → Update task state to "Deployed" → Notify stakeholders
+     - ❌ Health Check Fail → Trigger rollback.yml → Update task to "Rolled Back" → Create incident issue
+
+# Step 6: Post-Deployment Verification
+# If successful:
+  - Task state updated to: Deployed ✅
+  - Deployment ID recorded in task
+  - Deployed at timestamp: 2025-11-01T10:30:00Z
+  - Notification sent to: Slack #deployments channel
+  - Email notification: project-team@your-org.com
+
+# If failed (automatic rollback):
+  - Task state updated to: Rolled Back ⚠️
+  - Previous deployment ID activated
+  - Incident issue created: "[INCIDENT] Production deployment failed"
+  - Notification sent to: Slack #incidents channel (urgent)
+  - PagerDuty alert: On-call engineer notified
+  - Health check confirms: Previous version is healthy ✅
+
+# Step 7: Verify Production
+# Manual verification by non-technical user:
+  - Open production URL: https://odoo-prod.your-domain.com
+  - Navigate to Expenses menu
+  - Create test expense
+  - Submit for approval
+  - Verify approval workflow works as expected
+  - Mark task as "Verified" in Odoo
+
+# Rollback scenario example:
+# If health check fails (e.g., database migration error):
+  1. Health check endpoint returns 500 error ❌
+  2. deploy.yml detects failure
+  3. Triggers rollback.yml workflow automatically
+  4. Gets previous deployment ID from DigitalOcean
+  5. Creates deployment with previous ID
+  6. Waits for rollback completion (~1.5 min)
+  7. Verifies rollback health check ✅
+  8. Updates task state to "Rolled Back"
+  9. Creates GitHub issue with incident details
+  10. Notifies on-call engineer via PagerDuty
+```
+
+**Model Used**: N/A (fully automated workflow, no LLM needed)
+**Cost**: $0 (GitHub Actions free tier, DigitalOcean costs same regardless)
+**Time Saved**: ~20 minutes vs manual deployment process
+**Non-Technical Friendly**: ✅ Project managers can deploy without CLI access
+
+**Benefits**:
+- **Audit Trail**: Every deployment tracked in Odoo Project tasks
+- **Access Control**: Only approved tasks trigger deployments
+- **Automatic Rollback**: Health check failures trigger instant rollback
+- **Incident Management**: Failed deployments auto-create GitHub issues
+- **Notification**: Stakeholders informed via Slack/Email
+- **Zero CLI Knowledge**: Non-technical users can deploy via Odoo UI
+
+### Workflow 7: SOP-Guided Error Investigation (15 minutes)
+
+**Scenario**: Production deployment failed, use qms_sop module to investigate
+
+```bash
+# Step 1: SOP Selection in Odoo
+# Navigate to: Quality Management → SOPs → SOP Runs → Create
+# Select SOP: SOP-TRIAGE-001 (Error Investigation Workflow)
+# Click: "Start Execution"
+
+# Expected: SOP run created with 6 steps
+
+# Step 2: Execute Step 1 - Error Classification
+# SOP Step 1 Instructions:
+#   "Categorize error by type and assign severity"
+#
+# Action in terminal:
+doctl apps logs $DO_APP_ID --type DEPLOY --tail 100 | grep -i "error"
+
+# Example output:
+# ERROR: Database connection timeout
+# ERROR: Health check failed with status 500
+
+# Classification:
+#   - Category: DATABASE
+#   - Severity: CRITICAL (production down)
+
+# Mark step complete in Odoo:
+#   - Actual Result: "Database connection timeout, severity: CRITICAL"
+#   - State: Completed ✅
+
+# Step 3: Execute Step 2 - Gather Evidence
+# SOP Step 2 Instructions:
+#   "Collect all relevant logs and metrics"
+#
+# Actions:
+# a) Get deployment logs
+doctl apps logs $DO_APP_ID --type DEPLOY --tail 500 > /tmp/deployment.log
+
+# b) Get application logs
+doctl apps logs $DO_APP_ID --type RUN --tail 1000 > /tmp/application.log
+
+# c) Get database connection stats
+psql "$POSTGRES_URL" -c "
+  SELECT datname, numbackends, deadlocks
+  FROM pg_stat_database
+  WHERE datname = 'odoo';
+" > /tmp/db-stats.txt
+
+# d) Extract error patterns
+grep -E "(ERROR|FATAL|Exception)" /tmp/application.log > /tmp/errors.txt
+
+# Mark step complete in Odoo:
+#   - Actual Result: "Logs collected: deployment.log (15KB), application.log (50KB), db-stats.txt (1KB)"
+#   - Attach files to SOP run
+#   - State: Completed ✅
+
+# Step 4: Execute Step 3 - Root Cause Analysis (5 Whys)
+# SOP Step 3 Instructions:
+#   "Identify underlying cause using 5 Whys methodology"
+#
+# Analysis:
+# Why 1: Why did deployment fail?
+#   → Health check returned 500 error
+#
+# Why 2: Why did health check return 500?
+#   → Database connection timed out
+#
+# Why 3: Why did connection timeout?
+#   → Connection pool exhausted (20/20 connections in use)
+#
+# Why 4: Why was pool exhausted?
+#   → Long-running queries not releasing connections
+#
+# Why 5: Why are queries not releasing connections?
+#   → Missing connection cleanup in exception handlers
+
+# ROOT CAUSE: Exception handling code doesn't close database connections
+
+# Record in Odoo:
+#   - Create qms.sop.run.error record:
+#       Error Code: DB_CONNECTION_LEAK
+#       Description: "Missing finally blocks in DB exception handlers"
+#       Severity: HIGH
+#   - Mark step complete:
+#       Actual Result: "Root cause identified: DB_CONNECTION_LEAK"
+#       State: Completed ✅
+
+# Step 5: Execute Step 4 - Implement Fix
+# SOP Step 4 Instructions:
+#   "Apply corrective action to resolve error"
+#
+# Fix implementation:
+# a) Create fix branch
+git checkout -b fix/db-connection-leak
+
+# b) Update code with connection cleanup
+# Edit: custom_addons/expense_approval/models/expense_approval.py
+# Add try/finally blocks to ensure connection cleanup
+
+# c) Add regression test
+# Edit: custom_addons/expense_approval/tests/test_connection_cleanup.py
+def test_connection_cleanup_on_exception():
+    """Ensure connections closed even when exceptions occur."""
+    initial_count = get_connection_count()
+    try:
+        fetch_data_that_raises_exception()
+    except Exception:
+        pass
+    time.sleep(1)  # Wait for cleanup
+    assert get_connection_count() == initial_count
+
+# d) Validate fix locally
+pytest custom_addons/expense_approval/tests/test_connection_cleanup.py -v
+# Expected: PASSED ✅
+
+# e) Create PR
+git add .
+git commit -m "fix(expense): Add connection cleanup in exception handlers"
+git push origin fix/db-connection-leak
+gh pr create --title "Fix DB connection leak" --body "Closes incident #1234"
+
+# f) Deploy fix to staging
+gh workflow run deploy.yml -f environment=staging -f branch=fix/db-connection-leak
+
+# g) Verify fix in staging
+python scripts/health_check.py --url https://odoo-staging.your-domain.com
+# Expected: ✅ Health check passed
+
+# Mark step complete in Odoo:
+#   - Actual Result: "Fix implemented in PR #456, verified in staging"
+#   - State: Completed ✅
+
+# Step 6: Execute Step 5 - Document Resolution
+# SOP Step 5 Instructions:
+#   "Record resolution for future reference"
+#
+# Documentation tasks:
+# a) Update error code catalog
+# Navigate in Odoo: Quality Management → Error Codes → Create
+#   - Code: DB_CONNECTION_LEAK
+#   - Severity: High
+#   - Description: "Database connections not released in exception handlers"
+#   - Resolution: "Ensure all DB operations use try/finally blocks"
+#   - Related SOPs: SOP-TRIAGE-001
+
+# b) Create post-mortem document
+python scripts/create_postmortem.py \
+  --title "Production deployment failure - DB connection leak" \
+  --root-cause "Missing connection cleanup in exception handlers" \
+  --fix "Added finally blocks to ensure cleanup" \
+  --preventive "Add linting rule, connection pool monitoring"
+
+# c) Update knowledge base
+# Add to: knowledge/patterns/database_patterns.md
+# Section: "Connection Management Best Practices"
+# Content: "Always use try/finally for database operations..."
+
+# d) Create GitHub issue for preventive measures
+gh issue create \
+  --title "[TECH-DEBT] Audit all DB operations for connection cleanup" \
+  --body "Add linting rule to enforce try/finally blocks" \
+  --label tech-debt,database,high-priority
+
+# Mark step complete in Odoo:
+#   - Actual Result: "Documentation complete: error code added, post-mortem created, knowledge base updated"
+#   - State: Completed ✅
+
+# Step 7: Execute Step 6 - Preventive Measures
+# SOP Step 6 Instructions:
+#   "Prevent recurrence through systemic improvements"
+#
+# Preventive actions:
+# a) Add regression test (already done in Step 4)
+# b) Add CI validation for connection cleanup
+# Edit: .github/workflows/odoo-ci.yml
+- name: Check DB connection cleanup
+  run: |
+    # Ensure all DB cursors have try/finally
+    grep -r "cursor\(\)" custom_addons/ | while read line; do
+      if ! grep -A 10 "$line" | grep -q "finally"; then
+        echo "Missing finally block: $line"
+        exit 1
+      fi
+    done
+
+# c) Add monitoring alert for connection pool usage
+# (Example: configure alert when connections > 80%)
+
+# d) Enable Dependabot for automated dependency updates
+# Create: .github/dependabot.yml
+version: 2
+updates:
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+
+# Mark step complete in Odoo:
+#   - Actual Result: "Preventive measures implemented: CI validation, monitoring, Dependabot"
+#   - State: Completed ✅
+
+# Step 8: Complete SOP Run
+# All steps completed → SOP run state: Completed ✅
+# Total time: ~15 minutes (CRITICAL severity met <15 min SLA)
+# Resolution time: 15 minutes to mitigation, 2 hours to root cause fix (including PR review)
+
+# SOP run summary in Odoo:
+#   - Start time: 2025-11-01T10:45:00Z
+#   - End time: 2025-11-01T11:00:00Z
+#   - Duration: 15 minutes
+#   - Error code: DB_CONNECTION_LEAK
+#   - Root cause: Missing connection cleanup
+#   - Resolution: Try/finally blocks added
+#   - Preventive measures: 3 actions completed
+#   - All steps: 6/6 completed ✅
+```
+
+**Model Used**: N/A (SOP-guided manual investigation, no LLM needed)
+**Cost**: $0 (uses existing tools and logs)
+**Time Saved**: ~30 minutes vs unstructured debugging
+**SLA Compliance**: ✅ CRITICAL severity resolved in <15 minutes
+
+**Benefits**:
+- **Structured Approach**: SOP ensures no steps are missed
+- **Knowledge Capture**: All investigations tracked in qms_sop module
+- **Error Catalog**: Build library of known issues and resolutions
+- **Compliance**: Audit trail for incident response
+- **Training**: New team members follow proven procedures
+- **Continuous Improvement**: Preventive measures prevent recurrence
+
+---
+
 ## Performance Tips
 
 ### Speed Up Module Generation

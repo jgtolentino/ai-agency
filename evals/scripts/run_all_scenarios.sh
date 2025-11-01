@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # run_all_scenarios.sh - Master test runner for all evaluation scenarios
-# Target: ≥80% pass rate for Sprint 2 (4/5 passing)
+# Target: ≥95% pass rate for Production (Sprint 4)
 
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-RESULTS_FILE="$SCRIPT_DIR/../RESULTS.md"
+RESULTS_FILE="$SCRIPT_DIR/../RESULTS_SPRINT4.md"
 
 # Colors for output
 RED='\033[0;31m'
@@ -25,7 +25,7 @@ PASSED_SCENARIOS=0
 FAILED_SCENARIOS=0
 SKIPPED_SCENARIOS=0
 
-# Scenarios to run (Sprint 3 QA2: All 10 scenarios)
+# Scenarios to run (Sprint 4: All 12 scenarios including PRD modules)
 SCENARIOS=(
     "01_oca_scaffolding"
     "02_studio_export"
@@ -37,6 +37,8 @@ SCENARIOS=(
     "08_docker_compose_env"
     "09_visual_parity"
     "10_secrets_compliance"
+    "11_pulser_webhook_integration"
+    "12_qms_sop_workflow"
 )
 
 # Store results for summary
@@ -132,12 +134,12 @@ echo ""
 echo "📝 Writing results to $RESULTS_FILE..."
 
 cat > "$RESULTS_FILE" <<EOF
-# Evaluation Results - Sprint 3 (QA2)
+# Evaluation Results - Sprint 4 Production Validation
 
 **Date**: $(date '+%Y-%m-%d %H:%M:%S')
 **Pass Rate**: ${PASS_RATE}% ($PASSED_SCENARIOS/$TOTAL_SCENARIOS)
 **Total Time**: ${TOTAL_TIME}s
-**Target**: ≥80% pass rate
+**Target**: ≥95% pass rate (Production Ready)
 
 ---
 
@@ -214,21 +216,29 @@ cat >> "$RESULTS_FILE" <<EOF
 **Status**: ${SCENARIO_RESULTS[10_secrets_compliance]}
 **Validates**: No hardcoded API keys, passwords, tokens in codebase
 
+### 11: Pulser Webhook Integration
+**Status**: ${SCENARIO_RESULTS[11_pulser_webhook_integration]}
+**Validates**: HMAC signature generation, GitHub API integration, secret management
+
+### 12: QMS SOP Workflow
+**Status**: ${SCENARIO_RESULTS[12_qms_sop_workflow]}
+**Validates**: SOP run workflow, step tracking, error code linkage, state machine
+
 ---
 
 ## Pass Criteria
 
-**Sprint 3 Target**: ≥80% (8/10 scenarios passing)
+**Sprint 4 Target**: ≥95% (12/12 scenarios passing for production readiness)
 
 EOF
 
 # Check if target met
-if (( $(echo "$PASS_RATE >= 80" | bc -l) )); then
-    echo -e "${GREEN}✅ Target Met: Pass rate ${PASS_RATE}% ≥ 80%${NC}" >> "$RESULTS_FILE"
-    echo -e "${GREEN}✅ Target Met: Pass rate ${PASS_RATE}% ≥ 80%${NC}"
+if (( $(echo "$PASS_RATE >= 95" | bc -l) )); then
+    echo -e "${GREEN}✅ Target Met: Pass rate ${PASS_RATE}% ≥ 95%${NC}" >> "$RESULTS_FILE"
+    echo -e "${GREEN}✅ Target Met: Pass rate ${PASS_RATE}% ≥ 95%${NC}"
 else
-    echo -e "${RED}❌ Target Not Met: Pass rate ${PASS_RATE}% < 80%${NC}" >> "$RESULTS_FILE"
-    echo -e "${RED}❌ Target Not Met: Pass rate ${PASS_RATE}% < 80%${NC}"
+    echo -e "${RED}❌ Target Not Met: Pass rate ${PASS_RATE}% < 95%${NC}" >> "$RESULTS_FILE"
+    echo -e "${RED}❌ Target Not Met: Pass rate ${PASS_RATE}% < 95%${NC}"
 fi
 
 cat >> "$RESULTS_FILE" <<EOF
@@ -239,12 +249,13 @@ cat >> "$RESULTS_FILE" <<EOF
 
 EOF
 
-if (( $(echo "$PASS_RATE >= 80" | bc -l) )); then
+if (( $(echo "$PASS_RATE >= 95" | bc -l) )); then
     cat >> "$RESULTS_FILE" <<EOF
-1. ✅ Sprint 3 QA2 complete (10/10 scenarios)
-2. Review any warnings from scenarios
+1. ✅ Sprint 4 Production Validation complete (12/12 scenarios)
+2. All PRD modules validated (pulser_webhook, qms_sop)
 3. All pre-commit hooks configured
-4. Ready for production deployment
+4. CI/CD workflows operational
+5. ✅ **PRODUCTION READY**
 EOF
 else
     cat >> "$RESULTS_FILE" <<EOF
@@ -252,7 +263,7 @@ else
 2. Root cause analysis for failures
 3. Update knowledge base with findings
 4. Refine skills based on learnings
-5. Re-run scenarios until ≥80% pass rate
+5. Re-run scenarios until ≥95% pass rate
 EOF
 fi
 
@@ -262,12 +273,12 @@ echo ""
 
 # Exit with appropriate code
 if [ $FAILED_SCENARIOS -eq 0 ] && [ $SKIPPED_SCENARIOS -eq 0 ]; then
-    echo -e "${GREEN}🎉 All scenarios passed!${NC}"
+    echo -e "${GREEN}🎉 All scenarios passed! PRODUCTION READY ✅${NC}"
     exit 0
-elif (( $(echo "$PASS_RATE >= 80" | bc -l) )); then
+elif (( $(echo "$PASS_RATE >= 95" | bc -l) )); then
     echo -e "${GREEN}✅ Target met: ${PASS_RATE}% pass rate${NC}"
     exit 0
 else
-    echo -e "${RED}❌ Target not met: ${PASS_RATE}% pass rate (need ≥80%)${NC}"
+    echo -e "${RED}❌ Target not met: ${PASS_RATE}% pass rate (need ≥95%)${NC}"
     exit 1
 fi

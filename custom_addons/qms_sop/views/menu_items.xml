@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2025 Odoo Community Association (OCA) -->
+<!-- License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl-3.0). -->
+<odoo>
+    <!-- Main Menu -->
+    <menuitem id="menu_qms_sop_root"
+              name="QMS SOP"
+              sequence="100"
+              web_icon="qms_sop,static/description/icon.png"/>
+
+    <!-- Documents Menu -->
+    <menuitem id="menu_qms_sop_documents"
+              name="Documents"
+              parent="menu_qms_sop_root"
+              action="action_qms_sop_document"
+              sequence="10"/>
+
+    <!-- Runs Menu -->
+    <menuitem id="menu_qms_sop_runs"
+              name="Runs"
+              parent="menu_qms_sop_root"
+              action="action_qms_sop_run"
+              sequence="20"/>
+
+    <!-- Configuration Menu -->
+    <menuitem id="menu_qms_sop_config"
+              name="Configuration"
+              parent="menu_qms_sop_root"
+              sequence="100"/>
+
+    <!-- Error Codes Menu -->
+    <menuitem id="menu_qms_error_codes"
+              name="Error Codes"
+              parent="menu_qms_sop_config"
+              action="action_qms_error_code"
+              sequence="10"/>
+</odoo>

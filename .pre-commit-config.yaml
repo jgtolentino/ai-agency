@@ -11,6 +11,21 @@ default_language_version:
 
 repos:
   # ==========================================================================
+  # Ruff - Fast Python Linter and Formatter
+  # ==========================================================================
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.6.9
+    hooks:
+      - id: ruff
+        name: Lint Python code with ruff
+        args: [--fix, --exit-non-zero-on-fix]
+        exclude: ^(node_modules/|\.venv/|venv/)
+
+      - id: ruff-format
+        name: Format Python code with ruff
+        exclude: ^(node_modules/|\.venv/|venv/)
+
+  # ==========================================================================
   # Python Code Formatting
   # ==========================================================================
   - repo: https://github.com/psf/black

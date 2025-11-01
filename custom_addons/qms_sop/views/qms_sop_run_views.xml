@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2025 Odoo Community Association (OCA) -->
+<!-- License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl-3.0). -->
+<odoo>
+    <!-- Tree View -->
+    <record id="view_qms_sop_run_tree" model="ir.ui.view">
+        <field name="name">qms.sop.run.tree</field>
+        <field name="model">qms.sop.run</field>
+        <field name="arch" type="xml">
+            <tree string="SOP Runs">
+                <field name="sop_id"/>
+                <field name="started_by"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'draft'"
+                       decoration-warning="state == 'in_progress'"
+                       decoration-success="state == 'completed'"
+                       decoration-danger="state == 'failed'"/>
+                <field name="start_date"/>
+                <field name="end_date"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_qms_sop_run_form" model="ir.ui.view">
+        <field name="name">qms.sop.run.form</field>
+        <field name="model">qms.sop.run</field>
+        <field name="arch" type="xml">
+            <form string="SOP Run">
+                <header>
+                    <button name="action_start" type="object" string="Start"
+                            invisible="state != 'draft'"
+                            class="btn-primary"/>
+                    <button name="action_complete" type="object" string="Complete"
+                            invisible="state != 'in_progress'"
+                            class="btn-success"/>
+                    <button name="action_fail" type="object" string="Mark Failed"
+                            invisible="state != 'in_progress'"
+                            class="btn-danger"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,in_progress,completed"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="sop_id"/>
+                            <field name="started_by"/>
+                        </group>
+                        <group>
+                            <field name="start_date"/>
+                            <field name="end_date"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Steps">
+                            <field name="step_run_ids">
+                                <tree editable="bottom"
+                                      decoration-muted="state == 'pending'"
+                                      decoration-warning="state == 'in_progress'"
+                                      decoration-success="state == 'completed'"
+                                      decoration-danger="state == 'failed'">
+                                    <field name="step_sequence" invisible="1"/>
+                                    <field name="step_title"/>
+                                    <field name="state" widget="badge"/>
+                                    <field name="notes"/>
+                                    <button name="action_start" type="object" string="Start"
+                                            icon="fa-play" invisible="state != 'pending'"/>
+                                    <button name="action_complete" type="object" string="Complete"
+                                            icon="fa-check" invisible="state != 'in_progress'"/>
+                                    <button name="action_fail" type="object" string="Fail"
+                                            icon="fa-times" invisible="state != 'in_progress'"/>
+                                    <button name="action_skip" type="object" string="Skip"
+                                            icon="fa-forward" invisible="state != 'pending'"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Errors">
+                            <field name="error_ids">
+                                <tree editable="bottom">
+                                    <field name="error_code_id"/>
+                                    <field name="error_code"/>
+                                    <field name="error_severity" widget="badge"
+                                           decoration-danger="error_severity == 'critical'"
+                                           decoration-warning="error_severity == 'high'"/>
+                                    <field name="description"/>
+                                    <field name="created_at"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Result">
+                            <field name="result" widget="text"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_qms_sop_run" model="ir.actions.act_window">
+        <field name="name">SOP Runs</field>
+        <field name="res_model">qms.sop.run</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Start a new SOP execution
+            </p>
+            <p>
+                Track SOP execution progress with step-by-step tracking.
+            </p>
+        </field>
+    </record>
+
+    <!-- Action from SOP Document -->
+    <record id="action_qms_sop_run_from_document" model="ir.actions.act_window">
+        <field name="name">Runs</field>
+        <field name="res_model">qms.sop.run</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('sop_id', '=', active_id)]</field>
+        <field name="context">{'default_sop_id': active_id}</field>
+    </record>
+
+    <!-- Server Action on project.task -->
+    <record id="action_log_error_on_task" model="ir.actions.server">
+        <field name="name">Log Error</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="binding_model_id" ref="project.model_project_task"/>
+        <field name="binding_view_types">form</field>
+        <field name="state">code</field>
+        <field name="code">
+# Find or create SOP run for error triage
+triage_sop = env['qms.sop.document'].search([('code', '=', 'SOP-TRIAGE-001')], limit=1)
+
+if triage_sop:
+    # Create new run
+    run = env['qms.sop.run'].create({
+        'sop_id': triage_sop.id,
+        'started_by': env.user.id,
+        'state': 'in_progress',
+    })
+
+    # Open run form
+    action = {
+        'type': 'ir.actions.act_window',
+        'res_model': 'qms.sop.run',
+        'res_id': run.id,
+        'view_mode': 'form',
+        'target': 'new',
+    }
+else:
+    # Notify no SOP found
+    action = {
+        'type': 'ir.actions.client',
+        'tag': 'display_notification',
+        'params': {
+            'title': 'Warning',
+            'message': 'Error triage SOP (SOP-TRIAGE-001) not found',
+            'type': 'warning',
+        }
+    }
+        </field>
+    </record>
+</odoo>

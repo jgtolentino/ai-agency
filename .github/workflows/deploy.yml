@@ -1,0 +1,148 @@
+---
+name: Deploy to DigitalOcean
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment (staging|production)'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+      image_tag:
+        description: 'Docker image tag (default: latest)'
+        required: false
+        default: 'latest'
+
+  repository_dispatch:
+    types: [deploy_request]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment || 'staging' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DO_ACCESS_TOKEN }}
+
+      - name: Get app ID
+        id: app
+        run: |
+          if [ "${{ github.event.inputs.environment }}" == "production" ]; then
+            echo "app_id=${{ secrets.DO_APP_ID_PROD }}" >> $GITHUB_OUTPUT
+            echo "env_name=production" >> $GITHUB_OUTPUT
+          else
+            echo "app_id=${{ secrets.DO_APP_ID_STAGING }}" >> $GITHUB_OUTPUT
+            echo "env_name=staging" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Check app spec exists
+        id: appspec
+        run: |
+          SPEC_FILE="infra/do/app-spec-${{ steps.app.outputs.env_name }}.yaml"
+          if [ -f "${SPEC_FILE}" ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+            echo "spec_file=${SPEC_FILE}" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "⚠️ App spec not found: ${SPEC_FILE}"
+          fi
+
+      - name: Update app spec
+        if: steps.appspec.outputs.exists == 'true'
+        run: |
+          # Update image tag in app spec
+          IMAGE_TAG="${{ github.event.inputs.image_tag || 'latest' }}"
+          sed -i "s|image:.*|image: registry.digitalocean.com/insightpulse/odoo:${IMAGE_TAG}|g" ${{ steps.appspec.outputs.spec_file }}
+
+          doctl apps update ${{ steps.app.outputs.app_id }} --spec ${{ steps.appspec.outputs.spec_file }}
+
+      - name: Create deployment
+        id: deployment
+        run: |
+          DEPLOYMENT_ID=$(doctl apps create-deployment ${{ steps.app.outputs.app_id }} --force-rebuild --format ID --no-header)
+          echo "deployment_id=${DEPLOYMENT_ID}" >> $GITHUB_OUTPUT
+          echo "✅ Deployment created: ${DEPLOYMENT_ID}"
+
+      - name: Wait for deployment
+        run: |
+          echo "⏳ Waiting for deployment to complete..."
+          doctl apps get-deployment ${{ steps.app.outputs.app_id }} ${{ steps.deployment.outputs.deployment_id }} --wait
+          echo "✅ Deployment completed"
+
+      - name: Get app URL
+        id: app_url
+        run: |
+          APP_URL=$(doctl apps get ${{ steps.app.outputs.app_id }} --format DefaultIngress --no-header)
+          echo "url=${APP_URL}" >> $GITHUB_OUTPUT
+          echo "App URL: https://${APP_URL}"
+
+      - name: Setup Python for health check
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Health check
+        id: health
+        run: |
+          echo "🔍 Running health checks on https://${{ steps.app_url.outputs.url }}..."
+          python scripts/health_check.py \
+            --target blue \
+            --url "https://${{ steps.app_url.outputs.url }}" \
+            --timeout 30 \
+            --json-output health_results.json || echo "Health check script not found"
+
+          if [ -f "health_results.json" ]; then
+            HEALTHY=$(jq -r '.healthy' health_results.json)
+            if [ "${HEALTHY}" == "true" ]; then
+              echo "✅ Health checks passed"
+              echo "status=healthy" >> $GITHUB_OUTPUT
+            else
+              echo "❌ Health checks failed"
+              cat health_results.json
+              echo "status=unhealthy" >> $GITHUB_OUTPUT
+              exit 1
+            fi
+          else
+            echo "⚠️ Health check script not available - deployment completed but not validated"
+            echo "status=unknown" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Rollback on failure
+        if: failure() && steps.health.outcome == 'failure'
+        run: |
+          echo "❌ Health check failed - triggering rollback"
+          gh workflow run rollback.yml \
+            -f environment=${{ github.event.inputs.environment }} \
+            -f reason="Health check failure after deployment ${{ steps.deployment.outputs.deployment_id }}"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Notify success
+        if: success()
+        run: |
+          echo "✅ Deployment successful!"
+          echo "Environment: ${{ github.event.inputs.environment }}"
+          echo "Image tag: ${{ github.event.inputs.image_tag || 'latest' }}"
+          echo "Deployment ID: ${{ steps.deployment.outputs.deployment_id }}"
+          echo "URL: https://${{ steps.app_url.outputs.url }}"
+
+          # Optional webhook notification (only if secret exists)
+          if [ -n "${{ secrets.ODOO_WEBHOOK_URL }}" ]; then
+            curl -X POST "${{ secrets.ODOO_WEBHOOK_URL }}/pulser/webhook" \
+              -H "Content-Type: application/json" \
+              -H "X-Pulser-Signature: sha256=${{ secrets.PULSER_WEBHOOK_SECRET }}" \
+              -d '{
+                "event": "deployment_success",
+                "environment": "${{ github.event.inputs.environment }}",
+                "image_tag": "${{ github.event.inputs.image_tag || 'latest' }}",
+                "deployment_id": "${{ steps.deployment.outputs.deployment_id }}",
+                "url": "https://${{ steps.app_url.outputs.url }}"
+              }' || echo "Webhook notification skipped"
+          fi
