@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  <!-- Pulse-Hub Deployment Wizard Form -->
+  <record id="view_pulser_pulse_hub_wizard_form" model="ir.ui.view">
+    <field name="name">pulser.pulse.hub.wizard.form</field>
+    <field name="model">pulser.pulse.hub.wizard</field>
+    <field name="arch" type="xml">
+      <form string="Pulse-Hub Deployment" create="false" edit="true">
+        <sheet>
+          <group name="deployment_config" string="Deployment Configuration">
+            <group>
+              <field name="environment" widget="radio" options="{'horizontal': true}"/>
+              <field name="image_tag" placeholder="e.g., latest, v1.0.0, abc123"/>
+            </group>
+            <group>
+              <field name="service" widget="radio"/>
+            </group>
+          </group>
+
+          <group name="response" string="Deployment Response" attrs="{'invisible': [('response_json','=',False)]}">
+            <field name="response_json" readonly="1" nolabel="1" widget="ace" options="{'mode': 'json'}"/>
+          </group>
+
+          <div class="oe_chatter">
+            <div class="alert alert-info" role="alert">
+              <p><strong>Deployment Process:</strong></p>
+              <ol>
+                <li>Wizard generates HMAC-signed payload</li>
+                <li>GitHub App Installation Token obtained via JWT</li>
+                <li>POST to GitHub API: <code>/repos/{owner}/{repo}/dispatches</code></li>
+                <li>Event type: <code>deploy_pulse_hub</code></li>
+                <li>GitHub Actions workflow triggers DigitalOcean deployment</li>
+              </ol>
+              <p class="mb-0">
+                <strong>Note:</strong> Ensure GitHub App credentials are configured in environment variables.
+              </p>
+            </div>
+          </div>
+        </sheet>
+
+        <footer>
+          <button
+            string="Deploy Pulse-Hub"
+            type="object"
+            name="action_dispatch_pulse_hub"
+            class="btn-primary"/>
+          <button
+            string="Cancel"
+            special="cancel"
+            class="btn-secondary"/>
+        </footer>
+      </form>
+    </field>
+  </record>
+
+  <!-- Window Action for Pulse-Hub Wizard -->
+  <record id="action_pulser_pulse_hub_wizard" model="ir.actions.act_window">
+    <field name="name">Deploy Pulse-Hub</field>
+    <field name="res_model">pulser.pulse.hub.wizard</field>
+    <field name="view_mode">form</field>
+    <field name="target">new</field>
+    <field name="context">{}</field>
+  </record>
+
+  <!-- Menu Item: Settings > Technical > Pulser > Deploy Pulse-Hub -->
+  <menuitem
+    id="menu_pulser_pulse_hub"
+    name="Deploy Pulse-Hub"
+    parent="base.menu_administration"
+    action="action_pulser_pulse_hub_wizard"
+    sequence="100"
+    groups="base.group_system"/>
+</odoo>
