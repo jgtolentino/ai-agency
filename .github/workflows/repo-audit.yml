@@ -1,0 +1,60 @@
+name: Repo Audit (Anthropic Skills)
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build repo tree
+        run: |
+          sudo apt-get update && sudo apt-get install -y tree jq
+          tree -a -I 'node_modules|.git|__pycache__|.mypy_cache|.pytest_cache' > repo_tree.txt
+
+      - name: Gather key files (short, safest defaults)
+        run: |
+          mkdir -p .audit/in
+          # Odoo addons
+          find custom_addons -type f \( -name "__manifest__.py" -o -name "*.py" -o -name "*.xml" -o -name "*.csv" \) 2>/dev/null | head -n 200 | xargs -I{} sh -c 'echo "\n\nCODE[{}]\n"; sed -n "1,400p" "{}"; echo "\nENDCODE\n"' >> .audit/in/files.txt || true
+          # DevOps
+          for f in Dockerfile docker-compose*.yml .pre-commit-config.yaml odoo.conf; do
+            if [ -f "$f" ]; then echo "\n\nCODE[$f]\n" >> .audit/in/files.txt; sed -n "1,400p" "$f" >> .audit/in/files.txt; echo "\nENDCODE\n" >> .audit/in/files.txt; fi
+          done
+          find .github/workflows -type f -name "*.yml" -maxdepth 2 -print0 2>/dev/null | xargs -0 -I{} sh -c 'echo "\n\nCODE[{}]\n"; sed -n "1,400p" "{}"; echo "\nENDCODE\n"' >> .audit/in/files.txt || true
+          find infra -type f \( -name "*.tf" -o -name "*.yml" -o -name "*.yaml" \) 2>/dev/null | head -n 50 | xargs -I{} sh -c 'echo "\n\nCODE[{}]\n"; sed -n "1,400p" "{}"; echo "\nENDCODE\n"' >> .audit/in/files.txt || true
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install node-fetch@2
+
+      - name: Run Anthropic audit
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          MODEL: claude-3-5-sonnet-20241022
+          SKILL: repo-auditor
+        run: node .github/scripts/anthropic-audit.js
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: repo-audit
+          path: .audit/out/*
+
+      - name: Comment on PR
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          recreate: true
+          path: .audit/out/report.md

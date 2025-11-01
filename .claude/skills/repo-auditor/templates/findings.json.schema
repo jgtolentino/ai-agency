@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["summary", "findings", "missing_inputs", "pr_plan"],
+  "properties": {
+    "summary": {
+      "type": "object",
+      "required": ["critical","high","medium","low"],
+      "properties": {
+        "critical": {"type":"integer"},
+        "high": {"type":"integer"},
+        "medium": {"type":"integer"},
+        "low": {"type":"integer"}
+      }
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type":"object",
+        "required": ["id","category","severity","title","impact","fix"],
+        "properties": {
+          "id":{"type":"string"},
+          "category":{"type":"string"},
+          "severity":{"type":"string","enum":["critical","high","medium","low"]},
+          "file":{"type":"string"},
+          "line":{"type":["integer","null"]},
+          "title":{"type":"string"},
+          "evidence":{"type":"string"},
+          "impact":{"type":"string"},
+          "fix":{"type":"string"},
+          "references":{"type":"array","items":{"type":"string"}}
+        }
+      }
+    },
+    "missing_inputs": {"type":"array","items":{"type":"string"}},
+    "pr_plan": {
+      "type":"array",
+      "items":{
+        "type":"object",
+        "required":["order","title","files","est"],
+        "properties":{
+          "order":{"type":"integer"},
+          "title":{"type":"string"},
+          "files":{"type":"array","items":{"type":"string"}},
+          "est":{"type":"string"}
+        }
+      }
+    }
+  }
+}

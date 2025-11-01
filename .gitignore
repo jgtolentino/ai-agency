@@ -61,3 +61,8 @@ sessions/
 
 # Docker volumes (if testing locally)
 dbdata/
+
+# Audit artifacts
+.audit/
+repo_tree.txt
+node_modules/
