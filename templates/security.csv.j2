@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+{% for rule in access_rules %}
+access_{{ rule.model_safe }}_{{ rule.group_safe }},{{ rule.name }},model_{{ rule.model_safe }},{{ rule.group_ref }},{{ rule.perm_read }},{{ rule.perm_write }},{{ rule.perm_create }},{{ rule.perm_unlink }}
+{% endfor %}
