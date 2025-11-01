@@ -1,0 +1,368 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2025 Odoo Community Association (OCA) -->
+<!-- License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl-3.0). -->
+<odoo>
+    <data noupdate="1">
+        <!-- SOP 1: BUILD_IMAGE -->
+        <record id="sop_build_image" model="qms.sop.document">
+            <field name="code">SOP-BUILD-001</field>
+            <field name="name">Docker Image Build Process</field>
+            <field name="category">build</field>
+            <field name="content"><![CDATA[
+                <h2>Purpose</h2>
+                <p>Standard operating procedure for building and validating Docker images for Odoo deployments.</p>
+
+                <h2>Scope</h2>
+                <p>Applies to all Odoo module builds requiring custom Docker images.</p>
+
+                <h2>Prerequisites</h2>
+                <ul>
+                    <li>Docker Engine 20.10+ installed</li>
+                    <li>Access to base image registry</li>
+                    <li>Valid Dockerfile in repository</li>
+                </ul>
+
+                <h2>Safety Notes</h2>
+                <ul>
+                    <li>Always verify base image hash before build</li>
+                    <li>Run security scans before pushing to registry</li>
+                    <li>Test image in staging environment first</li>
+                </ul>
+            ]]></field>
+        </record>
+
+        <!-- Build Image Steps -->
+        <record id="sop_build_step_1" model="qms.sop.step">
+            <field name="sop_id" ref="sop_build_image"/>
+            <field name="sequence">10</field>
+            <field name="title">Pull base image and verify hash</field>
+            <field name="description"><![CDATA[
+                <p><strong>Command:</strong></p>
+                <pre>docker pull odoo:16.0
+docker inspect odoo:16.0 --format='{{.Id}}'</pre>
+
+                <p><strong>Verification:</strong></p>
+                <p>Compare hash with expected value in deployment documentation.</p>
+            ]]></field>
+        </record>
+
+        <record id="sop_build_step_2" model="qms.sop.step">
+            <field name="sop_id" ref="sop_build_image"/>
+            <field name="sequence">20</field>
+            <field name="title">Install dependencies and custom modules</field>
+            <field name="description"><![CDATA[
+                <p><strong>Command:</strong></p>
+                <pre>docker build -t odoo-custom:latest \
+  --build-arg ODOO_VERSION=16.0 \
+  --build-arg MODULES="account_payment_extend,qms_sop" .</pre>
+
+                <p><strong>Success Criteria:</strong></p>
+                <p>Build completes without errors, all dependencies resolved.</p>
+            ]]></field>
+        </record>
+
+        <record id="sop_build_step_3" model="qms.sop.step">
+            <field name="sop_id" ref="sop_build_image"/>
+            <field name="sequence">30</field>
+            <field name="title">Run unit tests</field>
+            <field name="description"><![CDATA[
+                <p><strong>Command:</strong></p>
+                <pre>docker run --rm odoo-custom:latest \
+  odoo-bin -i all -d test --test-enable --stop-after-init</pre>
+
+                <p><strong>Success Criteria:</strong></p>
+                <p>All tests pass, no critical errors in logs.</p>
+            ]]></field>
+        </record>
+
+        <record id="sop_build_step_4" model="qms.sop.step">
+            <field name="sop_id" ref="sop_build_image"/>
+            <field name="sequence">40</field>
+            <field name="title">Build and tag final image</field>
+            <field name="description"><![CDATA[
+                <p><strong>Command:</strong></p>
+                <pre>VERSION=$(git describe --tags --always)
+docker tag odoo-custom:latest registry.example.com/odoo-custom:${VERSION}
+docker tag odoo-custom:latest registry.example.com/odoo-custom:latest</pre>
+
+                <p><strong>Verification:</strong></p>
+                <p>Verify both tags created successfully.</p>
+            ]]></field>
+        </record>
+
+        <record id="sop_build_step_5" model="qms.sop.step">
+            <field name="sop_id" ref="sop_build_image"/>
+            <field name="sequence">50</field>
+            <field name="title">Push to registry</field>
+            <field name="description"><![CDATA[
+                <p><strong>Command:</strong></p>
+                <pre>docker push registry.example.com/odoo-custom:${VERSION}
+docker push registry.example.com/odoo-custom:latest</pre>
+
+                <p><strong>Success Criteria:</strong></p>
+                <p>Both images successfully pushed to registry.</p>
+            ]]></field>
+        </record>
+
+        <!-- Build Image Error Codes -->
+        <record id="error_wkhtmltopdf_mismatch" model="qms.error.code">
+            <field name="code">WKHTMLTOPDF_MISMATCH</field>
+            <field name="title">wkhtmltopdf version mismatch or missing</field>
+            <field name="severity">high</field>
+            <field name="sop_id" ref="sop_build_image"/>
+        </record>
+
+        <record id="error_base_image_drift" model="qms.error.code">
+            <field name="code">BASE_IMAGE_DRIFT</field>
+            <field name="title">Base image hash does not match expected value</field>
+            <field name="severity">critical</field>
+            <field name="sop_id" ref="sop_build_image"/>
+        </record>
+
+        <record id="error_test_failure" model="qms.error.code">
+            <field name="code">TEST_FAILURE</field>
+            <field name="title">Unit tests failed during build validation</field>
+            <field name="severity">high</field>
+            <field name="sop_id" ref="sop_build_image"/>
+        </record>
+
+        <!-- SOP 2: DEPLOY_DO -->
+        <record id="sop_deploy_do" model="qms.sop.document">
+            <field name="code">SOP-DEPLOY-001</field>
+            <field name="name">DigitalOcean App Platform Deployment</field>
+            <field name="category">deploy</field>
+            <field name="content"><![CDATA[
+                <h2>Purpose</h2>
+                <p>Standard operating procedure for deploying Odoo applications to DigitalOcean App Platform.</p>
+
+                <h2>Scope</h2>
+                <p>Applies to all production and staging deployments on DigitalOcean infrastructure.</p>
+
+                <h2>Prerequisites</h2>
+                <ul>
+                    <li>doctl CLI authenticated</li>
+                    <li>Valid app spec YAML</li>
+                    <li>Database migration scripts tested in staging</li>
+                    <li>Backup of current production state</li>
+                </ul>
+
+                <h2>Rollback Trigger</h2>
+                <p>Initiate rollback if health checks fail for more than 2 minutes or error rate exceeds 5%.</p>
+            ]]></field>
+        </record>
+
+        <!-- Deploy DO Steps -->
+        <record id="sop_deploy_step_1" model="qms.sop.step">
+            <field name="sop_id" ref="sop_deploy_do"/>
+            <field name="sequence">10</field>
+            <field name="title">Update app spec YAML</field>
+            <field name="description"><![CDATA[
+                <p><strong>Command:</strong></p>
+                <pre>doctl apps update $APP_ID --spec infra/do/app-spec.yaml</pre>
+
+                <p><strong>Verification:</strong></p>
+                <p>Verify spec updated with <code>doctl apps get $APP_ID</code></p>
+            ]]></field>
+        </record>
+
+        <record id="sop_deploy_step_2" model="qms.sop.step">
+            <field name="sop_id" ref="sop_deploy_do"/>
+            <field name="sequence">20</field>
+            <field name="title">Create deployment</field>
+            <field name="description"><![CDATA[
+                <p><strong>Command:</strong></p>
+                <pre>doctl apps create-deployment $APP_ID --force-rebuild</pre>
+
+                <p><strong>Monitor:</strong></p>
+                <p>Track deployment progress with <code>doctl apps logs $APP_ID --follow</code></p>
+            ]]></field>
+        </record>
+
+        <record id="sop_deploy_step_3" model="qms.sop.step">
+            <field name="sop_id" ref="sop_deploy_do"/>
+            <field name="sequence">30</field>
+            <field name="title">Health check validation</field>
+            <field name="description"><![CDATA[
+                <p><strong>Command:</strong></p>
+                <pre>for i in {1..10}; do
+  curl -sf https://$APP_URL/health && echo "✓ Health check $i passed" || echo "✗ Health check $i failed"
+  sleep 30
+done</pre>
+
+                <p><strong>Success Criteria:</strong></p>
+                <p>At least 9/10 health checks pass within 5 minutes.</p>
+            ]]></field>
+        </record>
+
+        <record id="sop_deploy_step_4" model="qms.sop.step">
+            <field name="sop_id" ref="sop_deploy_do"/>
+            <field name="sequence">40</field>
+            <field name="title">Traffic switch</field>
+            <field name="description"><![CDATA[
+                <p><strong>Action:</strong></p>
+                <p>If health checks pass, traffic automatically switches to new deployment.</p>
+
+                <p><strong>Manual Verification:</strong></p>
+                <pre>doctl apps list-deployments $APP_ID | head -5</pre>
+            ]]></field>
+        </record>
+
+        <record id="sop_deploy_step_5" model="qms.sop.step">
+            <field name="sop_id" ref="sop_deploy_do"/>
+            <field name="sequence">50</field>
+            <field name="title">Monitor for 15 minutes</field>
+            <field name="description"><![CDATA[
+                <p><strong>Monitoring:</strong></p>
+                <ul>
+                    <li>Error rate &lt; 1%</li>
+                    <li>Response time P95 &lt; 500ms</li>
+                    <li>No database deadlocks</li>
+                    <li>No memory leaks</li>
+                </ul>
+
+                <p><strong>Dashboard:</strong></p>
+                <p>Check DigitalOcean App Platform dashboard for metrics.</p>
+            ]]></field>
+        </record>
+
+        <!-- Deploy DO Error Codes -->
+        <record id="error_health_check_fail" model="qms.error.code">
+            <field name="code">HEALTH_CHECK_FAIL</field>
+            <field name="title">Health checks failed after deployment</field>
+            <field name="severity">critical</field>
+            <field name="sop_id" ref="sop_deploy_do"/>
+        </record>
+
+        <record id="error_db_migration_error" model="qms.error.code">
+            <field name="code">DB_MIGRATION_ERROR</field>
+            <field name="title">Database migration failed or timed out</field>
+            <field name="severity">critical</field>
+            <field name="sop_id" ref="sop_deploy_do"/>
+        </record>
+
+        <record id="error_rollback_needed" model="qms.error.code">
+            <field name="code">ROLLBACK_NEEDED</field>
+            <field name="title">Deployment requires rollback to previous version</field>
+            <field name="severity">high</field>
+            <field name="sop_id" ref="sop_deploy_do"/>
+        </record>
+
+        <!-- SOP 3: ERROR_TRIAGE -->
+        <record id="sop_error_triage" model="qms.sop.document">
+            <field name="code">SOP-TRIAGE-001</field>
+            <field name="name">Error Triage and CAPA</field>
+            <field name="category">error_triage</field>
+            <field name="content"><![CDATA[
+                <h2>Purpose</h2>
+                <p>Standard operating procedure for systematic error investigation and corrective action.</p>
+
+                <h2>Scope</h2>
+                <p>Applies to all production errors, incidents, and quality deviations.</p>
+
+                <h2>CAPA Process</h2>
+                <p>Corrective and Preventive Action (CAPA) process ensures root cause identification and prevention.</p>
+
+                <h2>Escalation Criteria</h2>
+                <ul>
+                    <li>Critical severity errors escalate immediately</li>
+                    <li>High severity errors escalate if not resolved within 1 hour</li>
+                    <li>Recurring errors (3+ occurrences) escalate to engineering team</li>
+                </ul>
+            ]]></field>
+        </record>
+
+        <!-- Error Triage Steps -->
+        <record id="sop_triage_step_1" model="qms.sop.step">
+            <field name="sop_id" ref="sop_error_triage"/>
+            <field name="sequence">10</field>
+            <field name="title">Capture logs and error context</field>
+            <field name="description"><![CDATA[
+                <p><strong>Required Information:</strong></p>
+                <ul>
+                    <li>Full error traceback</li>
+                    <li>Timestamp and timezone</li>
+                    <li>User session ID</li>
+                    <li>Request parameters</li>
+                    <li>Database transaction log</li>
+                </ul>
+
+                <p><strong>Command:</strong></p>
+                <pre>doctl apps logs $APP_ID --type run --tail 500 > error_context.log</pre>
+            ]]></field>
+        </record>
+
+        <record id="sop_triage_step_2" model="qms.sop.step">
+            <field name="sop_id" ref="sop_error_triage"/>
+            <field name="sequence">20</field>
+            <field name="title">Identify root cause</field>
+            <field name="description"><![CDATA[
+                <p><strong>Investigation Checklist:</strong></p>
+                <ul>
+                    <li>Check recent deployments or configuration changes</li>
+                    <li>Review database query performance</li>
+                    <li>Inspect third-party API failures</li>
+                    <li>Verify resource constraints (memory, CPU, disk)</li>
+                    <li>Analyze user input patterns</li>
+                </ul>
+
+                <p><strong>Tools:</strong></p>
+                <p>Use error code registry to find similar past incidents.</p>
+            ]]></field>
+        </record>
+
+        <record id="sop_triage_step_3" model="qms.sop.step">
+            <field name="sop_id" ref="sop_error_triage"/>
+            <field name="sequence">30</field>
+            <field name="title">Create CAPA task in project</field>
+            <field name="description"><![CDATA[
+                <p><strong>Task Details:</strong></p>
+                <ul>
+                    <li><strong>Title:</strong> [ERROR_CODE] Root cause description</li>
+                    <li><strong>Priority:</strong> Based on severity (Critical → Urgent)</li>
+                    <li><strong>Assignee:</strong> Relevant team member</li>
+                    <li><strong>Tags:</strong> CAPA, error_code, component</li>
+                    <li><strong>Description:</strong> Include error context, root cause, proposed fix</li>
+                </ul>
+
+                <p><strong>Link:</strong></p>
+                <p>Link to error monitoring dashboard and related deployment.</p>
+            ]]></field>
+        </record>
+
+        <record id="sop_triage_step_4" model="qms.sop.step">
+            <field name="sop_id" ref="sop_error_triage"/>
+            <field name="sequence">40</field>
+            <field name="title">Notify team</field>
+            <field name="description"><![CDATA[
+                <p><strong>Notification Channels:</strong></p>
+                <ul>
+                    <li><strong>Critical:</strong> Slack alert + Email + SMS</li>
+                    <li><strong>High:</strong> Slack alert + Email</li>
+                    <li><strong>Medium/Low:</strong> Slack alert only</li>
+                </ul>
+
+                <p><strong>Template:</strong></p>
+                <pre>🚨 [SEVERITY] Error Detected
+Error Code: [CODE]
+Component: [COMPONENT]
+Impact: [IMPACT_DESCRIPTION]
+CAPA Task: [TASK_LINK]</pre>
+            ]]></field>
+        </record>
+
+        <!-- Error Triage Error Codes -->
+        <record id="error_unknown_error" model="qms.error.code">
+            <field name="code">UNKNOWN_ERROR</field>
+            <field name="title">Unclassified error requiring investigation</field>
+            <field name="severity">medium</field>
+            <field name="sop_id" ref="sop_error_triage"/>
+        </record>
+
+        <record id="error_third_party_failure" model="qms.error.code">
+            <field name="code">THIRD_PARTY_FAILURE</field>
+            <field name="title">External service or API failure</field>
+            <field name="severity">high</field>
+            <field name="sop_id" ref="sop_error_triage"/>
+        </record>
+    </data>
+</odoo>
