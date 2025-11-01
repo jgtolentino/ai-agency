@@ -1,0 +1,96 @@
+---
+# DigitalOcean App Spec - Production Environment
+# Documentation: https://docs.digitalocean.com/products/app-platform/reference/app-spec/
+name: odoo-custom-production
+region: nyc
+domains:
+  - domain: odoo.example.com
+    type: PRIMARY
+    zone: example.com
+
+services:
+  - name: odoo
+    # Image from DigitalOcean Container Registry
+    image:
+      registry_type: DOCR
+      registry: insightpulse
+      repository: odoo
+      tag: latest
+
+    # Instance size (production sizing)
+    instance_count: 2  # High availability
+    instance_size_slug: professional-xs  # $12/month per instance
+
+    # Health check configuration
+    health_check:
+      http_path: /web/health
+      initial_delay_seconds: 60
+      period_seconds: 10
+      timeout_seconds: 5
+      success_threshold: 1
+      failure_threshold: 3
+
+    # HTTP configuration
+    http_port: 8069
+    routes:
+      - path: /
+
+    # Environment variables
+    envs:
+      - key: ODOO_RC
+        value: /etc/odoo/odoo.conf
+
+      - key: POSTGRES_HOST
+        value: ${db.HOSTNAME}
+        type: SECRET
+
+      - key: POSTGRES_PORT
+        value: ${db.PORT}
+        type: SECRET
+
+      - key: POSTGRES_DB
+        value: ${db.DATABASE}
+        type: SECRET
+
+      - key: POSTGRES_USER
+        value: ${db.USERNAME}
+        type: SECRET
+
+      - key: POSTGRES_PASSWORD
+        value: ${db.PASSWORD}
+        type: SECRET
+
+      - key: ODOO_ADMIN_PASSWD
+        scope: RUN_AND_BUILD_TIME
+        type: SECRET
+
+      - key: CLAUDE_API_KEY
+        scope: RUN_AND_BUILD_TIME
+        type: SECRET
+
+      - key: ENVIRONMENT
+        value: production
+
+    # Run command
+    run_command: odoo --config=/etc/odoo/odoo.conf
+
+# Database configuration (managed PostgreSQL)
+databases:
+  - name: db
+    engine: PG
+    version: "15"
+    production: true
+    cluster_name: odoo-production-db
+
+# Alerts
+alerts:
+  - rule: DEPLOYMENT_FAILED
+  - rule: DOMAIN_FAILED
+  - rule: CPU_UTILIZATION
+    value: 80
+  - rule: MEM_UTILIZATION
+    value: 80
+
+# Features
+features:
+  - buildpack-stack=ubuntu-22
