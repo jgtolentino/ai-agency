@@ -23,7 +23,10 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install pre-commit pytest pyyaml
+          pip install pre-commit pytest pyyaml pytest-asyncio pytest-cov
+          # Install packages in development mode
+          pip install -e packages/odoo-core[dev]
+          pip install -e packages/odoo-module-dev[dev]
 
       - name: Run pre-commit hooks (Sprint 3 QA2)
         run: |
@@ -33,7 +36,10 @@ jobs:
 
       - name: Run pytest
         run: |
-          pytest -q || true
+          # Run tests for packages
+          pytest packages/ -v --cov --cov-report=term-missing || true
+          # Run legacy tests if they exist
+          pytest tests/ -v || true
 
       - name: Validate YAML files
         run: |
