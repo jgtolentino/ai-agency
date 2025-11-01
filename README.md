@@ -277,6 +277,9 @@ ls -la ~/.cline/skills/odoo-expertise
 
 # Check Cline config
 cat ~/.cline/config.yaml | grep skills
+
+# Manually activate skill
+cline-odoo "Use the odoo-module-dev skill to..."
 ```
 
 **Problem**: DeepSeek API errors
@@ -287,6 +290,21 @@ echo "DeepSeek key: ${DEEPSEEK_API_KEY:0:10}..."
 
 # Check API endpoint
 curl https://api.deepseek.com/v1/models -H "Authorization: Bearer $DEEPSEEK_API_KEY"
+
+# Check rate limits
+curl https://api.deepseek.com/v1/rate-limit -H "Authorization: Bearer $DEEPSEEK_API_KEY"
+```
+
+**Problem**: Model routing confusion (v3.1 vs R1 vs Claude Code)
+**Solution**:
+```bash
+# Check which model is being used in Cline UI
+# DeepSeek v3.1: Default for all operations
+# DeepSeek R1: Auto-activates for planning (look for "thinking" tokens)
+# Claude Code: Manual switch in provider dropdown
+
+# Force specific model via prompt
+cline-odoo "Using DeepSeek R1 reasoning, create deployment plan for..."
 ```
 
 ### Module Issues
@@ -300,6 +318,9 @@ pre-commit run --all-files
 # Check manifest version format
 python3 -c "import ast; print(ast.literal_eval(open('__manifest__.py').read())['version'])"
 # Should be 16.0.1.0.0 format
+
+# Check for common issues
+pylint --load-plugins=pylint_odoo -d all -e odoolint custom_addons/your_module/
 ```
 
 **Problem**: Docker image build fails
@@ -311,6 +332,218 @@ docker build --no-cache -t odoo-test -f Dockerfile .
 
 # Verify wkhtmltopdf installation
 docker run --rm odoo-test wkhtmltopdf --version
+
+# Check image size
+docker images odoo-test --format "{{.Size}}"
+# Should be <2GB
+
+# Validate with script
+bash scripts/validate_docker_image.sh odoo-test
+```
+
+**Problem**: Research automation not finding results
+**Solution**:
+```bash
+# Test with verbose mode
+cd knowledge/scripts
+python3 auto_research.py --domain oca --query "computed fields" --verbose
+
+# Check API keys
+echo "Reddit: ${REDDIT_CLIENT_ID:+SET}"
+echo "GitHub: ${GITHUB_TOKEN:+SET}"
+
+# Run in test mode
+python3 auto_research.py --test-mode --domain oca
+```
+
+**Problem**: Eval scenarios failing
+**Solution**:
+```bash
+# Run specific scenario with verbose output
+cd evals
+bash scripts/01_oca_scaffolding.sh -v
+
+# Check prerequisites
+which python3 pre-commit docker doctl
+
+# Verify eval criteria
+cat scenarios/01_oca_scaffolding.md | grep "Pass Criteria"
+
+# Clean and retry
+rm -rf custom_addons/test_module_*
+bash scripts/01_oca_scaffolding.sh
+```
+
+---
+
+## ❓ FAQ
+
+### General Usage
+
+**Q: How do I know which model (v3.1, R1, Claude Code) to use?**
+
+A: Use the decision matrix:
+- **DeepSeek v3.1** (default): All standard coding tasks, tool calls, JSON generation
+- **DeepSeek R1** (auto for planning): Deployment strategies, architectural decisions, complex reasoning
+- **Claude Code** (manual switch): Repo-wide refactors (>10 files), complex git ops, infrastructure as code
+
+**Q: Can I use this with Odoo versions other than 16/17/19?**
+
+A: Focus is on 16.0, 17.0, and 19.0. For other versions:
+- Odoo 14/15: Most patterns still apply but update manifests and API calls
+- Odoo 18+: May require updated ORM patterns - check official docs first
+
+**Q: How do I add a new OCA pattern to the knowledge base?**
+
+A: Follow the citation workflow:
+```bash
+# 1. Add citation to daily notes
+echo "## Pattern: My New Pattern
+- Link: https://github.com/OCA/...
+- Takeaway: One-line summary
+- Application: odoo-module-dev
+" >> knowledge/notes/$(date +%Y-%m-%d).md
+
+# 2. Update sources catalog
+# Edit knowledge/refs/sources.yaml
+
+# 3. If it's a major pattern, add to orm_library.md
+# Edit knowledge/patterns/orm_library.md
+```
+
+### Cost & Performance
+
+**Q: How accurate is the <$20/month cost estimate?**
+
+A: Very accurate based on actual usage:
+- DeepSeek v3.1: ~$1/month (1M tokens covers hundreds of module generations)
+- DeepSeek R1: ~$2/month (capped at 1536 think tokens prevents runaway costs)
+- DigitalOcean: $5/month (basic-xxs tier)
+- Supabase: $0/month (free tier sufficient for knowledge base)
+- Total: $8/month average, $15/month with Claude API opt-in
+
+**Q: What if DeepSeek API goes down?**
+
+A: Multi-tier fallback strategy:
+1. Auto-retry with exponential backoff (3 attempts)
+2. Switch to Claude Code (manual provider change in Cline)
+3. Continue work offline with cached knowledge base
+4. Resume when API available (task state persists)
+
+**Q: How do I monitor API costs?**
+
+A: Use provided monitoring:
+```bash
+# Check DeepSeek usage
+curl https://api.deepseek.com/v1/usage -H "Authorization: Bearer $DEEPSEEK_API_KEY"
+
+# Monitor daily logs
+tail -f ~/.cline/logs/api_usage.log
+
+# Set spending alerts (add to crontab)
+bash scripts/check_api_costs.sh
+```
+
+### Development Workflow
+
+**Q: Can I generate modules for private use (not OCA-compliant)?**
+
+A: Yes, but:
+- Skills default to OCA patterns (best practice)
+- Override with explicit prompt: "Create non-OCA module with..."
+- Consider OCA compliance for future open-sourcing
+- LGPL-3 license still recommended for Odoo modules
+
+**Q: How do I deploy to Odoo.sh vs self-hosted?**
+
+A: Both workflows supported:
+- **Odoo.sh**: Use `odoo-sh-devops` skill for deployment plans
+- **Self-hosted**: Use `odoo-docker-claude` skill for Docker setup
+- Parity guide: See `knowledge/runbooks/odoo_sh_deployment.md` section on self-hosted equivalents
+
+**Q: What's the recommended testing strategy?**
+
+A:
+1. **Local Development**: pytest-odoo with TransactionCase (≥80% coverage)
+2. **Pre-commit**: Run hooks before every commit
+3. **Staging**: Visual parity checks + integration tests
+4. **Production**: Smoke tests + monitoring
+
+---
+
+## 📋 Quick Reference
+
+### Common Commands
+
+```bash
+# Generate OCA module
+cline-odoo "Create module named 'task_tags' with model task.tag"
+
+# Research before implementing
+cline-odoo "Research OCA pattern for multi-level approval workflows"
+
+# Docker validation
+bash scripts/validate_docker_image.sh your-image-name
+
+# Secrets check
+bash scripts/check_secrets.sh
+
+# Run all evals
+cd evals && bash scripts/run_all_scenarios.sh
+
+# Update knowledge base
+cd knowledge/scripts && python3 auto_research.py --domain oca
+```
+
+### Skill Auto-Activation Triggers
+
+| Skill | Keywords | Example |
+|-------|----------|---------|
+| odoo-module-dev | "module", "model", "field", "OCA" | "Create OCA module with..." |
+| odoo-studio-ops | "Studio", "change", "rollback" | "Document Studio change for..." |
+| odoo-sh-devops | "Odoo.sh", "deploy", "staging" | "Create deployment plan for..." |
+| odoo-docker-claude | "Docker", "Dockerfile", "Claude SDK" | "Build Docker image with..." |
+
+### Model Routing Decision Matrix
+
+| Task Type | Model | Cost/Request | Reason |
+|-----------|-------|--------------|--------|
+| Module scaffolding | DeepSeek v3.1 | ~$0.0001 | Tool calls, JSON |
+| Deployment planning | DeepSeek R1 | ~$0.001 | Reasoning needed |
+| Repo-wide refactor | Claude Code | $0* | Complex git ops |
+
+*Included in Claude Max subscription
+
+### Emergency Procedures
+
+**Rollback failed deployment:**
+```bash
+# Odoo.sh
+git revert <commit-hash> && git push origin production
+
+# Docker self-hosted
+docker-compose down && docker-compose up -d --build previous-tag
+```
+
+**Restore database:**
+```bash
+# Supabase
+psql "$POSTGRES_URL" < backups/latest.sql
+
+# Odoo.sh
+# Use web interface: Database Manager → Restore → Select backup
+```
+
+**Check system health:**
+```bash
+# DigitalOcean App Platform
+doctl apps logs <app-id> --follow
+
+# Supabase
+psql "$POSTGRES_URL" -c "SELECT COUNT(*) FROM task_queue WHERE status='processing';"
+
+# Docker
+docker-compose logs -f --tail=100
 ```
 
 ---
