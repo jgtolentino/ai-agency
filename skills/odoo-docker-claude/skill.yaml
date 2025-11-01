@@ -1,0 +1,75 @@
+---
+name: odoo-docker-claude
+version: 0.1.0
+role: "Docker image builder for Odoo + Claude SDK"
+description: "Build minimal, reproducible Docker images for Odoo with Claude SDK integration and production-grade security"
+license: Apache-2.0
+allowed-tools: [Read, Write, Edit, Bash]
+
+goals:
+  - Build minimal, reproducible Odoo images with wkhtmltopdf and fonts
+  - Integrate Anthropic Python SDK (v0.36.0+) for in-app AI features
+  - Implement non-root user pattern and secrets management
+  - Provide production-ready docker-compose configurations
+
+capabilities:
+  image_building:
+    - Multi-stage builds for optimal image size
+    - Python 3.11 base with Odoo 16/17/19 support
+    - wkhtmltopdf with proper font rendering (Noto, DejaVu)
+    - System dependencies (libxml2, libxslt, libjpeg, libpng, libpq)
+    - Non-root user pattern (uid 1000)
+
+  sdk_integration:
+    - Anthropic Python SDK installation
+    - Environment variable configuration
+    - Opt-in pattern with USE_ANTHROPIC_SDK flag
+    - Safe API key handling (never in Dockerfile)
+
+  security:
+    - Secrets via environment variables only
+    - No hardcoded credentials
+    - Volume mount patterns for custom addons
+    - Read-only root filesystem support
+
+  orchestration:
+    - Docker Compose with PostgreSQL 15
+    - Volume management (database, addons, logs)
+    - Network isolation
+    - Health checks and restart policies
+
+  development_experience:
+    - Hot-reload for custom addons
+    - Debug mode configuration
+    - Timezone and locale support
+    - Log aggregation
+
+deliverables:
+  - "infra/odoo/Dockerfile (multi-stage, non-root, Claude SDK)"
+  - "infra/odoo/docker-compose.yml (Odoo + PostgreSQL)"
+  - "infra/odoo/odoo.conf (development and production variants)"
+  - "infra/odoo/requirements.txt (Python dependencies)"
+  - "infra/odoo/.env.example (environment variable template)"
+
+cross_references:
+  - existing_infrastructure: ~/infra/odoo/
+  - sample_addons: ~/custom_addons/sc_demo/
+  - deployment_constraints: See CLAUDE.md for DigitalOcean App Platform usage
+
+supply_chain_security:
+  - non_root_user: true
+  - secrets_handling: "env/secret files only, never in Dockerfile or compose"
+  - base_image_pinning: "python:3.11-slim with SHA256 digest"
+  - vulnerability_scanning: "trivy or grype integration"
+
+model_routing:
+  default: deepseek/deepseek-v3.1
+  reasoning: deepseek/deepseek-r1
+  escalate_to_claude_code: "complex multi-service orchestration, Kubernetes manifests"
+
+examples:
+  - "Build Odoo 16 image with wkhtmltopdf, fonts, and Anthropic SDK (non-root)"
+  - "Create docker-compose.yml with PostgreSQL, volume mounts, and health checks"
+  - "Add opt-in Claude SDK integration with USE_ANTHROPIC_SDK environment flag"
+  - "Generate production-ready odoo.conf with security hardening"
+  - "Create .env.example with all required environment variables documented"

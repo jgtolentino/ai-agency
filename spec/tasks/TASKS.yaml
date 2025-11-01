@@ -1,0 +1,282 @@
+---
+version: 1.0
+last_updated: 2025-11-01
+project: odoo-agent-expertise
+
+tracks:
+  - name: skills
+    description: "Skill manifest creation and registration"
+    tasks:
+      - id: SK1
+        desc: "Publish 4 skill manifests; register in SuperClaude/Cline"
+        status: completed
+        deliverables:
+          - skills/odoo-module-dev/skill.yaml
+          - skills/odoo-studio-ops/skill.yaml
+          - skills/odoo-sh-devops/skill.yaml
+          - skills/odoo-docker-claude/skill.yaml
+        acceptance_criteria:
+          - All skill manifests valid YAML
+          - Skills symlinked to ~/.cline/skills/odoo-expertise/
+          - Cline config updated with odoo_expertise workflow
+
+      - id: SK2
+        desc: "Add deep-research playbook & auto-citation template"
+        status: pending
+        deliverables:
+          - knowledge/playbooks/deep_research_odoo.md
+          - knowledge/notes/citation_template.md
+        acceptance_criteria:
+          - Query sets defined for OCA, Reddit, Odoo forums
+          - Citation template with link, date, takeaway, snippet fields
+          - Integration with existing deep-research-oca skill
+
+  - name: dev
+    description: "Module development capabilities"
+    tasks:
+      - id: DEV1
+        desc: "Scaffold OCA module with security + tests + pre-commit"
+        status: pending
+        deliverables:
+          - Example OCA module with full structure
+          - Pre-commit configuration
+          - pytest-odoo test templates
+        acceptance_criteria:
+          - Module passes pre-commit hooks
+          - Tests run successfully with pytest-odoo
+          - Security rules (access + record rules) present
+          - Manifest follows OCA conventions
+
+      - id: DEV2
+        desc: "Add ORM computed field with @api.depends + record rule"
+        status: pending
+        deliverables:
+          - Computed field examples in knowledge base
+          - Record rule domain expression patterns
+          - Performance considerations documentation
+        acceptance_criteria:
+          - "@api.depends correctly implemented"
+          - Stored vs non-stored patterns documented
+          - Record rule examples for common scenarios
+          - N+1 query detection notes
+
+      - id: DEV3
+        desc: "Migration script patterns with openupgradelib"
+        status: pending
+        deliverables:
+          - Migration script templates
+          - Pre-migration and post-migration examples
+          - Version upgrade checklist
+        acceptance_criteria:
+          - openupgradelib patterns documented
+          - Data migration strategies covered
+          - Rollback procedures included
+
+  - name: ops
+    description: "Infrastructure and deployment operations"
+    tasks:
+      - id: OPS1
+        desc: "Docker image (wkhtmltopdf, fonts, non-root) + Anthropic SDK"
+        status: pending
+        deliverables:
+          - infra/odoo/Dockerfile (multi-stage)
+          - infra/odoo/docker-compose.yml
+          - infra/odoo/requirements.txt
+        acceptance_criteria:
+          - Image builds successfully
+          - wkhtmltopdf works without errors
+          - Fonts render correctly (Noto, DejaVu)
+          - Non-root user (uid 1000)
+          - Anthropic SDK importable
+          - No hardcoded secrets
+
+      - id: OPS2
+        desc: "Odoo.sh parity docs and branch strategy"
+        status: pending
+        deliverables:
+          - knowledge/playbooks/odoo-sh/deployment.md
+          - knowledge/playbooks/self-hosted/parity_guide.md
+          - Branch strategy documentation
+        acceptance_criteria:
+          - Dev → Staging → Prod workflow documented
+          - Build pipeline steps covered
+          - Backup/restore procedures included
+          - Self-hosted Docker Compose equivalents provided
+
+      - id: OPS3
+        desc: "Blue-green deployment strategy with health checks"
+        status: pending
+        deliverables:
+          - Deployment runbooks
+          - Health check configurations
+          - Rollback procedures
+        acceptance_criteria:
+          - Zero-downtime deployment documented
+          - Health check endpoints defined
+          - Automated rollback triggers specified
+
+  - name: qa
+    description: "Quality assurance and evaluation"
+    tasks:
+      - id: QA1
+        desc: "Evals (10 scenarios); gate CI on pass"
+        status: pending
+        deliverables:
+          - evals/scenarios/01_oca_scaffolding.md
+          - evals/scenarios/02_studio_change_plan.md
+          - evals/scenarios/03_docker_validation.md
+          - evals/scenarios/04_odoo_sh_deployment.md
+          - evals/scenarios/05_secrets_compliance.md
+          - evals/scenarios/06_record_rule_n1.md
+          - evals/scenarios/07_migration_script.md
+          - evals/scenarios/08_docker_compose_env.md
+          - evals/scenarios/09_visual_parity.md
+          - evals/scenarios/10_task_bus_integration.md
+          - evals/scripts/run_all_evals.sh
+        acceptance_criteria:
+          - All 10 scenarios executable
+          - CI workflow runs evals
+          - ≥95% pass rate required for merge
+          - Eval failures logged for knowledge base updates
+
+      - id: QA2
+        desc: "Pre-commit hook configuration with OCA checks"
+        status: pending
+        deliverables:
+          - .pre-commit-config.yaml
+          - OCA hook integration
+        acceptance_criteria:
+          - black, isort, flake8, pylint-odoo configured
+          - oca-gen-addon-readme optional hook
+          - Pre-commit runs on all commits
+          - CI enforces pre-commit pass
+
+  - name: knowledge
+    description: "Knowledge base curation"
+    tasks:
+      - id: KB1
+        desc: "Curate ≥20 high-signal references (OCA, Reddit, official docs)"
+        status: pending
+        deliverables:
+          - knowledge/refs/sources.yaml
+          - knowledge/notes/*.md (≥20 entries)
+        acceptance_criteria:
+          - Sources dated 2023+ (Odoo 16-19 era)
+          - OCA-aligned content
+          - 1-2 line takeaways per reference
+          - Categorized by skill domain
+
+      - id: KB2
+        desc: "Create ORM pattern library (≥10 validated patterns)"
+        status: pending
+        deliverables:
+          - knowledge/playbooks/orm_patterns.md
+        acceptance_criteria:
+          - Computed fields, related fields, stored fields
+          - "@api.depends, @api.onchange, @api.constrains examples"
+          - Domain expression patterns
+          - Performance considerations
+
+  - name: integration
+    description: "Integration with existing infrastructure"
+    tasks:
+      - id: INT1
+        desc: "Cross-reference existing Docker infrastructure (~/infra/odoo/)"
+        status: pending
+        deliverables:
+          - Updated skill manifests with cross_references
+          - Integration documentation
+        acceptance_criteria:
+          - odoo-docker-claude skill references ~/infra/odoo/
+          - No duplication of existing Dockerfile
+          - Enhancements documented separately
+
+      - id: INT2
+        desc: "Cross-reference existing sample module (~/custom_addons/sc_demo/)"
+        status: pending
+        deliverables:
+          - Updated odoo-module-dev skill manifest
+          - Comparison documentation
+        acceptance_criteria:
+          - sc_demo used as reference implementation
+          - New patterns extend (not replace) sc_demo
+          - Differences documented in knowledge base
+
+      - id: INT3
+        desc: "Cross-reference deep-research-oca skill"
+        status: pending
+        deliverables:
+          - Integration playbook
+          - Coordinated query strategies
+        acceptance_criteria:
+          - deep_research_odoo.md references existing skill
+          - Query sets complementary (not duplicative)
+          - Shared citation format
+
+  - name: docs
+    description: "Documentation and usage guides"
+    tasks:
+      - id: DOC1
+        desc: "Create main README with quickstart"
+        status: pending
+        deliverables:
+          - README.md
+        acceptance_criteria:
+          - Clear quickstart section (≤5 steps)
+          - Installation instructions
+          - Daily usage examples
+          - Link to full documentation
+
+      - id: DOC2
+        desc: "Create daily usage guide and improvement workflow"
+        status: pending
+        deliverables:
+          - docs/DAILY_USAGE.md
+          - docs/IMPROVEMENT_WORKFLOW.md
+        acceptance_criteria:
+          - Common commands documented
+          - Note-taking workflow explained
+          - Eval failure → knowledge update loop described
+          - Model routing guidance provided
+
+      - id: DOC3
+        desc: "Create cost analysis and performance benchmarks"
+        status: pending
+        deliverables:
+          - docs/COST_ANALYSIS.md
+          - docs/PERFORMANCE_BENCHMARKS.md
+        acceptance_criteria:
+          - Monthly cost breakdown <$20 USD
+          - Performance targets documented (P95 <30s)
+          - DeepSeek vs Claude cost comparison
+          - Optimization recommendations
+
+milestones:
+  - name: Sprint 1 Complete
+    date: 2025-11-08
+    criteria:
+      - SK1 completed
+      - Repository structure validated
+      - CI/CD baseline functional
+
+  - name: Sprint 2 Complete
+    date: 2025-11-15
+    criteria:
+      - SK2, DEV1, DEV2 completed
+      - First 5 eval scenarios passing
+      - Knowledge base seeded
+
+  - name: Sprint 3 Complete
+    date: 2025-11-22
+    criteria:
+      - OPS1, OPS2 completed
+      - All 10+ eval scenarios added
+      - Self-hosted parity documented
+
+  - name: Production Ready
+    date: 2025-11-29
+    criteria:
+      - QA1 completed (≥95% pass rate)
+      - All documentation complete
+      - Cost validated <$20 USD
+      - Performance targets met

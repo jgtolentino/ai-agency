@@ -1,0 +1,170 @@
+---
+# Authoritative Sources for Odoo Agent Expertise
+# Last Updated: 2025-11-01
+
+official:
+  odoo_docs:
+    - url: https://www.odoo.com/page/developers-on-demand
+      description: Official Odoo development services
+      relevance: General Odoo development guidance
+
+    - url: https://www.odoo.com/app/studio-features
+      description: Odoo Studio features and capabilities
+      relevance: Studio operations (odoo-studio-ops skill)
+
+    - url: https://www.odoo.sh/features
+      description: Odoo.sh platform features
+      relevance: Odoo.sh lifecycle (odoo-sh-devops skill)
+
+    - url: https://www.odoo.com/documentation/16.0/
+      description: Odoo 16.0 official documentation
+      relevance: Module development, ORM, views, security
+
+    - url: https://www.odoo.com/documentation/17.0/
+      description: Odoo 17.0 official documentation
+      relevance: Version-specific features and migration
+
+    - url: https://www.odoo.com/documentation/19.0/
+      description: Odoo 19.0 official documentation
+      relevance: Latest features and patterns
+
+oca:
+  repositories:
+    - url: https://github.com/OCA/account-financial-tools
+      description: Accounting and financial modules
+      tags: [accounting, finance, invoicing]
+
+    - url: https://github.com/OCA/sale-workflow
+      description: Sales workflow enhancements
+      tags: [sales, quotations, orders]
+
+    - url: https://github.com/OCA/purchase-workflow
+      description: Purchase workflow improvements
+      tags: [purchasing, procurement, vendors]
+
+    - url: https://github.com/OCA/stock-logistics-workflow
+      description: Inventory and warehouse management
+      tags: [inventory, warehouse, logistics]
+
+    - url: https://github.com/OCA/project
+      description: Project management modules
+      tags: [projects, tasks, timesheets]
+
+    - url: https://github.com/OCA/server-tools
+      description: Server tools and utilities
+      tags: [performance, utilities, automation]
+
+    - url: https://github.com/OCA/web
+      description: Web interface enhancements
+      tags: [ui, frontend, widgets]
+
+    - url: https://github.com/OCA/maintainer-tools
+      description: OCA development tools
+      tags: [pre-commit, linting, scaffolding]
+      priority: high
+
+  guidelines:
+    - url: https://github.com/OCA/odoo-community.org
+      description: OCA community guidelines
+      tags: [standards, conventions, licensing]
+      priority: high
+
+    - url: https://github.com/OCA/oca-addons-repo-template
+      description: OCA repository template
+      tags: [scaffolding, ci-cd, structure]
+      priority: high
+
+communities:
+  reddit:
+    - url: https://www.reddit.com/r/odoo/
+      description: Odoo subreddit
+      search_queries:
+        - "site:reddit.com/r/odoo ORM performance"
+        - "site:reddit.com/r/odoo docker wkhtmltopdf"
+        - "site:reddit.com/r/odoo studio export"
+        - "site:reddit.com/r/odoo.sh deployment"
+      curation_rule: "≥5 upvotes, resolution provided, 2023+"
+
+  forums:
+    - url: https://www.odoo.com/forum/help-1
+      description: Official Odoo forums
+      search_queries:
+        - "computed field @api.depends"
+        - "record rule multi-company"
+        - "migration openupgradelib"
+      curation_rule: "Official responses, solved status"
+
+  stackoverflow:
+    - url: https://stackoverflow.com/questions/tagged/odoo
+      description: Stack Overflow Odoo tag
+      search_queries:
+        - "[odoo] @api.depends computed field"
+        - "[odoo] record rules domain"
+        - "[odoo] docker wkhtmltopdf fonts"
+      curation_rule: "≥10 upvotes, accepted answer, 2023+"
+
+vendors:
+  oca_compliant:
+    - url: https://www.odoo-bs.com/odoo-development-services
+      description: OCA-compliant Odoo development services
+      tags: [consulting, development, support]
+
+  # Add more OCA-aligned vendors as discovered
+
+research_targets:
+  odoo_module_dev:
+    keywords: [orm, models, computed fields, record rules, security, testing, pytest-odoo]
+    sources: [oca.repositories, oca.guidelines, communities.stackoverflow]
+    priority_repos:
+      - OCA/server-tools
+      - OCA/maintainer-tools
+
+  odoo_studio_ops:
+    keywords: [studio, views, fields, server actions, automations, export]
+    sources: [official.odoo_docs, communities.reddit, communities.forums]
+    search_focus: "Studio export XML, rollback procedures"
+
+  odoo_sh_devops:
+    keywords: [odoo.sh, deployment, branches, builds, staging, logs, backups]
+    sources: [official.odoo_docs, communities.reddit]
+    search_focus: "Odoo.sh vs self-hosted, Docker parity"
+
+  odoo_docker_claude:
+    keywords: [docker, wkhtmltopdf, fonts, anthropic, sdk, non-root]
+    sources: [communities.reddit, communities.stackoverflow]
+    priority_topics:
+      - "Docker multi-stage builds Odoo"
+      - "wkhtmltopdf fonts Noto DejaVu"
+      - "Anthropic Python SDK Docker"
+      - "non-root user pattern"
+
+search_strategies:
+  parallel_queries:
+    - "Execute all research_targets queries in parallel"
+    - "Deduplicate results across sources"
+    - "Rank by quality score (upvotes, official response, recency)"
+
+  quality_scoring:
+    official_response: 100
+    oca_maintainer: 90
+    high_upvotes: 80  # ≥20 upvotes
+    medium_upvotes: 60  # 10-19 upvotes
+    recent_2024: 50
+    recent_2023: 30
+
+  recency_bonus:
+    2025: +20
+    2024: +10
+    2023: +5
+    2022_older: -10
+
+integration:
+  deep_research_skill:
+    path: ~/.cline/skills/odoo/deep-research-oca/SKILL.md
+    coordination: "Use query sets from this file, output citations to knowledge/notes/"
+
+  daily_workflow:
+    - "Run automated research queries (via deep-research-oca skill)"
+    - "Review results for quality and relevance"
+    - "Add high-signal findings to daily note (knowledge/notes/YYYY-MM-DD.md)"
+    - "Update playbooks with validated patterns"

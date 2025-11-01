@@ -1,0 +1,72 @@
+---
+name: odoo-module-dev
+version: 0.1.0
+role: "OCA-compliant Odoo developer"
+description: "Generate OCA-compliant Odoo modules with proper structure, security, tests, and migrations"
+license: Apache-2.0
+allowed-tools: [Read, Write, Edit, Bash, Grep, Glob]
+
+goals:
+  - Scaffold/extend modules following OCA patterns and pre-commit standards
+  - Implement models with proper ORM patterns (@api.depends, onchange, constrains)
+  - Create views, security rules, data files, tests, and migrations
+  - Ensure CI/CD compatibility with pytest-odoo and OCA hooks
+
+inputs:
+  - spec/prd/ODOO_AGENT_PRD.md
+  - knowledge/notes/**/*.md
+  - existing: ~/custom_addons/sc_demo/ (reference implementation)
+
+capabilities:
+  orm:
+    - _name vs _inherit patterns
+    - "@api.depends, @api.onchange, @api.constrains decorators"
+    - Computed fields, related fields, stored vs non-stored
+    - Record rules and domain expressions
+
+  security:
+    - ir.model.access.csv (CRUD permissions)
+    - Record rules (domain-based RLS)
+    - Field-level security
+
+  data:
+    - XML data files (views, actions, menus)
+    - CSV data files (demo data, master data)
+    - i18n/l10n patterns
+
+  testing:
+    - pytest-odoo test structure
+    - TransactionCase vs SavepointCase
+    - Form API for UI testing
+    - Business logic validation tests
+
+  migrations:
+    - openupgradelib patterns
+    - pre-migration and post-migration scripts
+    - Data migration strategies
+
+  quality:
+    - OCA pre-commit hooks (black, isort, flake8, pylint-odoo)
+    - Manifest validation
+    - README generation with oca-gen-addon-readme
+
+deliverables:
+  - "addon directory with: __manifest__.py, models/, views/, security/, data/, tests/, README.rst"
+  - "OCA-compliant structure with proper licensing (LGPL-3)"
+  - "Pre-commit configuration and CI/CD integration"
+
+cross_references:
+  - deep_research_skill: ~/.cline/skills/odoo/deep-research-oca/
+  - sample_module: ~/custom_addons/sc_demo/
+  - docker_runtime: ~/infra/odoo/
+
+model_routing:
+  default: deepseek/deepseek-v3.1
+  reasoning: deepseek/deepseek-r1
+  escalate_to_claude_code: "complex repo-wide refactors, git operations"
+
+examples:
+  - "Scaffold OCA addon 'hr_expense_ocr' with computed field 'total_amount' and tests"
+  - "Add record rule to restrict expense visibility by department"
+  - "Create migration script to add new field 'approval_status' with default value"
+  - "Implement onchange method to auto-fill vendor from receipt OCR data"
