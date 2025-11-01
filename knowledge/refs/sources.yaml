@@ -1,6 +1,7 @@
 ---
 # Authoritative Sources for Odoo Agent Expertise
 # Last Updated: 2025-11-01
+# KB1 Seeded: 26 high-quality citations
 
 official:
   odoo_docs:
@@ -20,13 +21,61 @@ official:
       description: Odoo 16.0 official documentation
       relevance: Module development, ORM, views, security
 
+    - url: https://www.odoo.com/documentation/16.0/developer.html
+      description: Odoo 16.0 developer guide
+      relevance: Complete dev guide with Getting Started tutorial
+      quality_score: 100
+      added: 2025-11-01
+
+    - url: https://www.odoo.com/documentation/16.0/developer/howtos.html
+      description: Odoo 16.0 how-to guides
+      relevance: Practical guides for customization, views, web services
+      quality_score: 100
+      added: 2025-11-01
+
     - url: https://www.odoo.com/documentation/17.0/
       description: Odoo 17.0 official documentation
       relevance: Version-specific features and migration
 
+    - url: https://www.odoo.com/documentation/17.0/developer/reference/backend/orm.html
+      description: Odoo 17.0 ORM API reference
+      relevance: Models, Fields, Recordsets, Environment, ORM methods
+      quality_score: 100
+      added: 2025-11-01
+
+    - url: https://www.odoo.com/documentation/17.0/administration/odoo_sh/getting_started/branches.html
+      description: Odoo.sh branches and deployment (17.0)
+      relevance: Production, staging, development branch workflows
+      quality_score: 100
+      added: 2025-11-01
+
+    - url: https://www.odoo.com/documentation/18.0/
+description: Odoo 18.0 official documentation
+      relevance: Latest version features and patterns
+      quality_score: 100
+      added: 2025-11-01
+
+    - url: https://www.odoo.com/odoo-18-release-notes
+      description: Odoo 18.0 release notes and new features
+      relevance: What's new in 18.0 for migration planning
+      quality_score: 110
+      added: 2025-11-01
+
     - url: https://www.odoo.com/documentation/19.0/
       description: Odoo 19.0 official documentation
       relevance: Latest features and patterns
+
+    - url: https://www.odoo.com/documentation/19.0/administration/odoo_sh/getting_started/branches.html
+      description: Odoo.sh branches (19.0)
+      relevance: Latest Odoo.sh deployment and monitoring features
+      quality_score: 110
+      added: 2025-11-01
+
+    - url: https://www.odoo.com/documentation/14.0/applications/productivity/studio/how_to/export_import.html
+      description: Odoo Studio export and import
+      relevance: Studio customization export/import workflows
+      quality_score: 90
+      added: 2025-11-01
 
 oca:
   repositories:
@@ -62,6 +111,33 @@ oca:
       description: OCA development tools
       tags: [pre-commit, linting, scaffolding]
       priority: high
+      quality_score: 90
+      added: 2025-11-01
+
+    - url: https://github.com/OCA/odoo-pre-commit-hooks
+      description: Pre-commit hooks for Odoo (oca-checks-odoo-module)
+      tags: [pre-commit, linting, validation]
+      priority: high
+      quality_score: 90
+      added: 2025-11-01
+
+    - url: https://github.com/OCA/maintainer-tools/tree/master/template/module
+      description: OCA module template structure
+      tags: [template, module-structure, readme]
+      quality_score: 90
+      added: 2025-11-01
+
+    - url: https://github.com/OCA/multi-company
+      description: Multi-company security patterns and modules
+      tags: [multi-company, security, record-rules]
+      quality_score: 90
+      added: 2025-11-01
+
+    - url: https://github.com/OCA/odoo-test-helper
+      description: Testing tools and fake model helpers
+      tags: [testing, pytest, models]
+      quality_score: 90
+      added: 2025-11-01
 
   guidelines:
     - url: https://github.com/OCA/odoo-community.org
@@ -73,6 +149,22 @@ oca:
       description: OCA repository template
       tags: [scaffolding, ci-cd, structure]
       priority: high
+      quality_score: 90
+      added: 2025-11-01
+
+    - url: https://github.com/OCA/maintainer-tools/blob/master/CONTRIBUTING.md
+      description: OCA contribution guidelines
+      tags: [contribution, manifest, versioning, licensing]
+      priority: high
+      quality_score: 90
+      added: 2025-11-01
+
+    - url: https://github.com/OCA/maintainer-tools/wiki/Migration-to-version-17.0
+      description: Migration guide to Odoo 17.0
+      tags: [migration, odoo-17, ruff, linting]
+      priority: high
+      quality_score: 95
+      added: 2025-11-01
 
 communities:
   reddit:
@@ -103,6 +195,43 @@ communities:
         - "[odoo] docker wkhtmltopdf fonts"
       curation_rule: "≥10 upvotes, accepted answer, 2023+"
 
+    - url: https://stackoverflow.com/questions/52309255/odoo-11-improving-performance-of-computed-search-method-when-no-direct-relatio
+      description: Computed field performance optimization
+      tags: [performance, computed-field, optimization]
+      quality_score: 70
+      added: 2025-11-01
+
+    - url: https://stackoverflow.com/questions/57477013/many2many-field-related-to-another-model
+      description: Many2many relationship patterns
+      tags: [many2many, orm, relationships]
+      quality_score: 70
+      added: 2025-11-01
+
+    - url: https://stackoverflow.com/questions/65776664/odoo-13-record-rules-write-access-on-specific-records
+      description: Record rules security best practices
+      tags: [security, record-rules, multi-company]
+      quality_score: 70
+      added: 2025-11-01
+
+    - url: https://stackoverflow.com/questions/31945069/odoo-computed-fields-works-without-store-true-doesnt-work-with-store-true
+      description: Computed field store=True behavior
+      tags: [computed-field, store, cache]
+      quality_score: 70
+      added: 2025-11-01
+
+  community_articles:
+    - url: https://www.odoo.com/forum/help-1/wkhtml2pdf-in-docker-253393
+      description: wkhtmltopdf in Docker configuration
+      tags: [docker, wkhtmltopdf, pdf]
+      quality_score: 75
+      added: 2025-11-01
+
+    - url: https://dev.to/drownie/odoo-docker-fix-print-bug-3phj
+      description: Odoo Docker print bug fix
+      tags: [docker, wkhtmltopdf, debugging]
+      quality_score: 65
+      added: 2025-11-01
+
 vendors:
   oca_compliant:
     - url: https://www.odoo-bs.com/odoo-development-services
@@ -110,6 +239,40 @@ vendors:
       tags: [consulting, development, support]
 
   # Add more OCA-aligned vendors as discovered
+
+docker_infrastructure:
+  production_deployment:
+    - url: https://medium.com/@karan.bk/configure-odoo-with-nginx-as-a-reverse-proxy-9b758056de66
+      description: Nginx reverse proxy configuration for Odoo
+      tags: [nginx, reverse-proxy, production]
+      quality_score: 75
+      added: 2025-11-01
+
+    - url: https://github.com/Ozrlz/odoo-nginx-reverse-proxy
+      description: Docker nginx reverse proxy with Let's Encrypt
+      tags: [docker, nginx, ssl, letsencrypt]
+      quality_score: 75
+      added: 2025-11-01
+
+    - url: https://jortdevreeze.com/blog/odoo-2/setting-up-a-reverse-proxy-for-odoo-with-nginx-proxy-manager-in-docker-8
+      description: Nginx Proxy Manager for Odoo
+      tags: [nginx-proxy-manager, docker, gui]
+      quality_score: 75
+      added: 2025-11-01
+
+    - url: https://victorhachard.github.io/notes/odoo-meet-docker
+      description: Comprehensive Docker production deployment guide
+      tags: [docker, production, postgresql, logging]
+      quality_score: 85
+      added: 2025-11-01
+
+testing_tools:
+  pytest_odoo:
+    - url: https://github.com/camptocamp/pytest-odoo
+      description: pytest plugin for Odoo addon testing
+      tags: [pytest, testing, tdd]
+      quality_score: 80
+      added: 2025-11-01
 
 research_targets:
   odoo_module_dev:
