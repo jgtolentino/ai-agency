@@ -1,0 +1,154 @@
+---
+# =============================================================================
+# Pre-commit Hooks Configuration for Odoo Expertise Agent
+# =============================================================================
+# Installation: pip install pre-commit && pre-commit install
+# Run manually: pre-commit run --all-files
+# OCA Compliance: Aligned with OCA guidelines for Odoo module development
+
+default_language_version:
+  python: python3.11
+
+repos:
+  # ==========================================================================
+  # Python Code Formatting
+  # ==========================================================================
+  - repo: https://github.com/psf/black
+    rev: 24.4.2
+    hooks:
+      - id: black
+        name: Format Python code with black
+        language_version: python3.11
+        args: [--line-length=88]
+        exclude: ^(node_modules/|\.venv/|venv/)
+
+  # ==========================================================================
+  # Import Sorting
+  # ==========================================================================
+  - repo: https://github.com/PyCQA/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+        name: Sort Python imports with isort
+        args: [--profile=black, --line-length=88]
+        exclude: ^(node_modules/|\.venv/|venv/)
+
+  # ==========================================================================
+  # Python Linting
+  # ==========================================================================
+  - repo: https://github.com/PyCQA/flake8
+    rev: 7.0.0
+    hooks:
+      - id: flake8
+        name: Lint Python code with flake8
+        args:
+          - --max-line-length=88
+          - --extend-ignore=E203,W503
+          - --exclude=node_modules,.venv,venv,__pycache__,.git
+        exclude: ^(node_modules/|\.venv/|venv/)
+
+  # ==========================================================================
+  # Odoo-Specific Linting (OCA Standards)
+  # ==========================================================================
+  - repo: https://github.com/OCA/pylint-odoo
+    rev: v9.0.5
+    hooks:
+      - id: pylint_odoo
+        name: Lint Odoo modules with pylint-odoo
+        args:
+          - --rcfile=.pylintrc-mandatory
+          - --load-plugins=pylint_odoo
+        additional_dependencies:
+          - pylint-odoo==9.0.5
+        exclude: ^(node_modules/|\.venv/|venv/|tests/)
+
+  # ==========================================================================
+  # OCA README Generation (Optional)
+  # ==========================================================================
+  - repo: https://github.com/OCA/maintainer-tools
+    rev: master
+    hooks:
+      - id: oca-gen-addon-readme
+        name: Generate OCA-compliant README
+        stages: [manual]  # Only runs when explicitly called
+        args: [--addons-dir=custom_addons]
+
+  # ==========================================================================
+  # YAML Validation
+  # ==========================================================================
+  - repo: https://github.com/pre-commit/mirrors-yamllint
+    rev: v1.35.1
+    hooks:
+      - id: yamllint
+        name: Validate YAML files
+        args:
+          - -d
+          - "{extends: relaxed, rules: {line-length: {max: 120}}}"
+        exclude: ^(node_modules/|\.venv/|venv/)
+
+  # ==========================================================================
+  # General File Cleanup
+  # ==========================================================================
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace
+        name: Remove trailing whitespace
+        exclude: ^(node_modules/|\.venv/|venv/|\.md$)
+
+      - id: end-of-file-fixer
+        name: Ensure files end with newline
+        exclude: ^(node_modules/|\.venv/|venv/)
+
+      - id: check-yaml
+        name: Validate YAML syntax
+        exclude: ^(node_modules/|\.venv/|venv/)
+
+      - id: check-added-large-files
+        name: Check for large files
+        args: [--maxkb=500]
+        exclude: ^(node_modules/|\.venv/|venv/)
+
+      - id: check-merge-conflict
+        name: Check for merge conflicts
+        exclude: ^(node_modules/|\.venv/|venv/)
+
+      - id: check-json
+        name: Validate JSON syntax
+        exclude: ^(node_modules/|\.venv/|venv/)
+
+      - id: check-toml
+        name: Validate TOML syntax
+        exclude: ^(node_modules/|\.venv/|venv/)
+
+  # ==========================================================================
+  # Security: No Secrets Committed
+  # ==========================================================================
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.4.0
+    hooks:
+      - id: detect-secrets
+        name: Detect hardcoded secrets
+        args: [--baseline, .secrets.baseline]
+        exclude: ^(node_modules/|\.venv/|venv/|evals/scenarios/10_secrets_compliance\.md)
+
+# =============================================================================
+# Configuration Notes
+# =============================================================================
+# 1. Install: pip install pre-commit && pre-commit install
+# 2. Run manually: pre-commit run --all-files
+# 3. Skip hook: SKIP=hook_id git commit -m "message"
+# 4. OCA README: pre-commit run oca-gen-addon-readme --all-files
+# 5. Update hooks: pre-commit autoupdate
+#
+# OCA Compliance:
+# - black: Code formatting (88 char line length)
+# - isort: Import sorting (black profile)
+# - flake8: General linting (ignore E203, W503 for black compat)
+# - pylint-odoo: Odoo-specific linting (OCA standards)
+# - oca-gen-addon-readme: Generate README.rst from fragments
+#
+# References:
+# - OCA Guidelines: https://github.com/OCA/odoo-community.org
+# - pylint-odoo: https://github.com/OCA/pylint-odoo
+# - Maintainer Tools: https://github.com/OCA/maintainer-tools
