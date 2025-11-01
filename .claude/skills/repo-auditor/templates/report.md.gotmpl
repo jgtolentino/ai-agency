@@ -1,0 +1,44 @@
+# Repo Audit – {{ .repo_name }}
+
+## Executive Summary
+- Critical: {{ .summary.critical }} | High: {{ .summary.high }} | Medium: {{ .summary.medium }} | Low: {{ .summary.low }}
+{{ range .top_risks -}}
+- {{ . }}
+{{ end }}
+
+## Findings
+{{ range .findings -}}
+### {{ .severity | upper }} – {{ .title }}
+**File:** {{ .file }}:{{ .line }}
+**Impact:** {{ .impact }}
+
+**Evidence**
+```
+{{ .evidence }}
+```
+
+**Fix**
+{{ .fix }}
+
+**Refs:** {{ join .references ", " }}
+{{ end }}
+
+## Quick Wins (≤1 day)
+{{ range .quick_wins -}}
+- {{ . }}
+{{ end }}
+
+## Strategic Fixes (multi-day)
+{{ range .strategic_fixes -}}
+- {{ . }}
+{{ end }}
+
+## Missing Inputs
+{{ range .missing_inputs -}}
+- {{ . }}
+{{ end }}
+
+## Suggested PR Plan
+{{ range .pr_plan -}}
+- ({{ .order }}) {{ .title }} — files: {{ join .files ", " }} — ETA: {{ .est }}
+{{ end }}
