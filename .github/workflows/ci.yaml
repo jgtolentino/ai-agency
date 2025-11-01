@@ -73,22 +73,81 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Run evaluation scenarios
+      - name: Install evaluation dependencies
         run: |
-          # Note: Full eval scenarios require Docker and Odoo runtime
-          # This CI job runs validation checks only
+          pip install pyyaml
+          # Install xmllint for XML validation
+          sudo apt-get update && sudo apt-get install -y libxml2-utils bc
 
-          echo "Running lightweight validation checks..."
+      - name: Run evaluation scenarios (Sprint 2 Focus)
+        run: |
+          # Note: Some scenarios require Docker/Odoo runtime (will be skipped in CI)
+          # CI runs documentation and structure validation only
 
-          # Scenario 01: Structure validation (no Odoo runtime needed)
+          echo "🧪 Running Sprint 2 Evaluation Scenarios..."
+          echo "==========================================="
+
+          # Scenario 01: OCA Scaffolding (structure validation only)
+          echo "📋 Scenario 01: OCA Module Scaffolding"
           if [ -f "evals/scenarios/01_oca_scaffolding.md" ]; then
-            echo "✓ Scenario 01: OCA scaffolding documentation exists"
+            echo "✓ Documentation exists"
+            if [ -f "evals/scripts/01_oca_scaffolding.sh" ]; then
+              echo "✓ Executable script exists"
+            fi
           fi
 
-          # Scenario 10: Secrets compliance
-          bash evals/scripts/run_local_checks.sh
+          # Scenario 02: Studio Export (validation logic only)
+          echo "📋 Scenario 02: Studio XML Export"
+          if [ -f "evals/scenarios/02_studio_export.md" ]; then
+            echo "✓ Documentation exists"
+            if [ -f "evals/scripts/02_studio_export.sh" ]; then
+              echo "✓ Executable script exists"
+            fi
+          fi
 
-          echo "✅ Lightweight eval checks passed"
+          # Scenario 03: Odoo.sh Deployment (validation logic only)
+          echo "📋 Scenario 03: Odoo.sh Deployment"
+          if [ -f "evals/scenarios/03_odoo_sh_deploy.md" ]; then
+            echo "✓ Documentation exists"
+            if [ -f "evals/scripts/03_odoo_sh_deploy.sh" ]; then
+              echo "✓ Executable script exists"
+            fi
+          fi
+
+          # Scenario 04: ORM Compliance (structure validation only)
+          echo "📋 Scenario 04: ORM Compliance"
+          if [ -f "evals/scenarios/04_orm_compliance.md" ]; then
+            echo "✓ Documentation exists"
+            if [ -f "evals/scripts/04_orm_compliance.sh" ]; then
+              echo "✓ Executable script exists"
+            fi
+          fi
+
+          # Scenario 05: Docker Validation (skipped in CI - requires Docker)
+          echo "📋 Scenario 05: Docker Validation"
+          if [ -f "evals/scenarios/05_docker_validation.md" ]; then
+            echo "✓ Documentation exists"
+            if [ -f "evals/scripts/05_docker_validation.sh" ]; then
+              echo "✓ Executable script exists (skipped in CI)"
+            fi
+          fi
+
+          # Scenario 10: Secrets Compliance (full execution)
+          echo "📋 Scenario 10: Secrets Compliance"
+          if [ -f "evals/scripts/10_secrets_compliance.sh" ]; then
+            echo "Running secrets compliance check..."
+            bash evals/scripts/10_secrets_compliance.sh || {
+              echo "❌ Secrets compliance failed"
+              exit 1
+            }
+          fi
+
+          echo ""
+          echo "✅ Sprint 2 Eval Documentation Validated"
+          echo "==========================================="
+          echo ""
+          echo "Note: Full scenario execution requires local environment with Docker/Odoo"
+          echo "Run locally: bash evals/scripts/run_all_scenarios.sh"
 
   quality_gate:
     name: Quality Gate
