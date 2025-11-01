@@ -1,0 +1,13 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_qms_sop_document_user,qms.sop.document.user,model_qms_sop_document,base.group_user,1,0,0,0
+access_qms_sop_document_system,qms.sop.document.system,model_qms_sop_document,base.group_system,1,1,1,1
+access_qms_sop_step_user,qms.sop.step.user,model_qms_sop_step,base.group_user,1,0,0,0
+access_qms_sop_step_system,qms.sop.step.system,model_qms_sop_step,base.group_system,1,1,1,1
+access_qms_error_code_user,qms.error.code.user,model_qms_error_code,base.group_user,1,0,0,0
+access_qms_error_code_system,qms.error.code.system,model_qms_error_code,base.group_system,1,1,1,1
+access_qms_sop_run_user,qms.sop.run.user,model_qms_sop_run,base.group_user,1,1,1,0
+access_qms_sop_run_system,qms.sop.run.system,model_qms_sop_run,base.group_system,1,1,1,1
+access_qms_sop_run_step_user,qms.sop.run.step.user,model_qms_sop_run_step,base.group_user,1,1,1,0
+access_qms_sop_run_step_system,qms.sop.run.step.system,model_qms_sop_run_step,base.group_system,1,1,1,1
+access_qms_sop_run_error_user,qms.sop.run.error.user,model_qms_sop_run_error,base.group_user,1,1,1,0
+access_qms_sop_run_error_system,qms.sop.run.error.system,model_qms_sop_run_error,base.group_system,1,1,1,1

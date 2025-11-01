@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright 2025 Odoo Community Association (OCA) -->
+<!-- License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl-3.0). -->
+<odoo>
+    <!-- Tree View -->
+    <record id="view_qms_sop_document_tree" model="ir.ui.view">
+        <field name="name">qms.sop.document.tree</field>
+        <field name="model">qms.sop.document</field>
+        <field name="arch" type="xml">
+            <tree string="SOPs">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="category"/>
+                <field name="active" widget="boolean_toggle"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_qms_sop_document_form" model="ir.ui.view">
+        <field name="name">qms.sop.document.form</field>
+        <field name="model">qms.sop.document</field>
+        <field name="arch" type="xml">
+            <form string="SOP">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="%(action_qms_sop_run_from_document)d"
+                                type="action"
+                                class="oe_stat_button"
+                                icon="fa-play-circle">
+                            <field name="run_ids" widget="statinfo" string="Runs"/>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Archived" bg_color="bg-danger" invisible="active"/>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="code"/>
+                        </group>
+                        <group>
+                            <field name="category"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Content">
+                            <field name="content" widget="html"/>
+                        </page>
+                        <page string="Steps">
+                            <field name="step_ids">
+                                <tree editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="title"/>
+                                    <field name="description" widget="html"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Error Codes">
+                            <field name="error_code_ids">
+                                <tree>
+                                    <field name="code"/>
+                                    <field name="title"/>
+                                    <field name="severity" widget="badge"
+                                           decoration-danger="severity == 'critical'"
+                                           decoration-warning="severity == 'high'"
+                                           decoration-info="severity == 'medium'"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Kanban View -->
+    <record id="view_qms_sop_document_kanban" model="ir.ui.view">
+        <field name="name">qms.sop.document.kanban</field>
+        <field name="model">qms.sop.document</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="category"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click">
+                            <div class="o_kanban_record_top">
+                                <div class="o_kanban_record_headings">
+                                    <strong class="o_kanban_record_title">
+                                        <field name="code"/> - <field name="name"/>
+                                    </strong>
+                                </div>
+                                <span class="badge badge-pill">
+                                    <field name="category"/>
+                                </span>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_qms_sop_document" model="ir.actions.act_window">
+        <field name="name">SOPs</field>
+        <field name="res_model">qms.sop.document</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first Standard Operating Procedure
+            </p>
+            <p>
+                Define structured SOPs with steps and error codes for consistent execution.
+            </p>
+        </field>
+    </record>
+</odoo>
