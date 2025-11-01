@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright {{ year }} {{ author }} -->
+<!-- License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl-3.0). -->
+
+<odoo>
+
+    <!-- Wizard Form View -->
+    <record id="view_{{ wizard_safe }}_form" model="ir.ui.view">
+        <field name="name">{{ wizard_model }}.form</field>
+        <field name="model">{{ wizard_model }}</field>
+        <field name="arch" type="xml">
+            <form string="{{ wizard_title }}">
+                <group>
+{% for field in fields %}
+                    <field name="{{ field.name }}"/>
+{% endfor %}
+                </group>
+                <footer>
+                    <button
+                        name="{{ action_method }}"
+                        type="object"
+                        string="{{ action_button_label }}"
+                        class="btn-primary"
+                    />
+{% if cancel_button %}
+                    <button
+                        string="Cancel"
+                        class="btn-secondary"
+                        special="cancel"
+                    />
+{% endif %}
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Wizard Action -->
+    <record id="action_{{ wizard_safe }}" model="ir.actions.act_window">
+        <field name="name">{{ wizard_title }}</field>
+        <field name="res_model">{{ wizard_model }}</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="binding_model_id" ref="{{ binding_model_ref }}"/>
+        <field name="binding_view_types">{{ binding_view_types }}</field>
+    </record>
+
+</odoo>

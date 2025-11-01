@@ -1,0 +1,120 @@
+# -*- coding: utf-8 -*-
+# Copyright {{ year }} {{ author }}
+# License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl-3.0).
+
+from odoo import api, fields, models, _
+from odoo.exceptions import UserError, ValidationError
+
+
+class {{ class_name }}(models.Model):
+    """{{ model_description }}"""
+
+    _name = '{{ model_name }}'
+    _description = '{{ model_description }}'
+{% if inherit_model %}
+    _inherit = {{ inherit_model }}
+{% endif %}
+{% if order %}
+    _order = '{{ order }}'
+{% endif %}
+{% if rec_name and rec_name != 'name' %}
+    _rec_name = '{{ rec_name }}'
+{% endif %}
+
+    # Fields
+{% for field in fields %}
+    {{ field.name }} = fields.{{ field.type }}(
+{% if field.string %}
+        string='{{ field.string }}',
+{% endif %}
+{% if field.required %}
+        required={{ field.required|lower }},
+{% endif %}
+{% if field.readonly %}
+        readonly={{ field.readonly|lower }},
+{% endif %}
+{% if field.default %}
+        default={{ field.default }},
+{% endif %}
+{% if field.help %}
+        help='{{ field.help }}',
+{% endif %}
+{% if field.compute %}
+        compute='{{ field.compute }}',
+{% endif %}
+{% if field.store is defined %}
+        store={{ field.store|lower }},
+{% endif %}
+{% if field.selection %}
+        selection={{ field.selection }},
+{% endif %}
+{% if field.comodel_name %}
+        comodel_name='{{ field.comodel_name }}',
+{% endif %}
+{% if field.relation %}
+        relation='{{ field.relation }}',
+{% endif %}
+{% if field.column1 %}
+        column1='{{ field.column1 }}',
+        column2='{{ field.column2 }}',
+{% endif %}
+{% if field.domain %}
+        domain={{ field.domain }},
+{% endif %}
+{% if field.ondelete %}
+        ondelete='{{ field.ondelete }}',
+{% endif %}
+{% if field.index %}
+        index={{ field.index|lower }},
+{% endif %}
+{% if field.tracking %}
+        tracking={{ field.tracking|lower }},
+{% endif %}
+    )
+{% endfor %}
+
+{% if computed_fields %}
+    # Computed fields
+{% for field in computed_fields %}
+    @api.depends({{ field.depends }})
+    def {{ field.compute_method }}(self):
+        """Compute {{ field.name }}"""
+        for record in self:
+            # TODO: Implement computation logic
+            record.{{ field.name }} = {{ field.default_value }}
+{% endfor %}
+
+{% endif %}
+{% if onchange_methods %}
+    # Onchange methods
+{% for method in onchange_methods %}
+    @api.onchange('{{ method.field }}')
+    def {{ method.name }}(self):
+        """Handle {{ method.field }} change"""
+        # TODO: Implement onchange logic
+        pass
+{% endfor %}
+
+{% endif %}
+{% if constraint_methods %}
+    # Constraints
+{% for constraint in constraint_methods %}
+    @api.constrains({{ constraint.fields }})
+    def {{ constraint.name }}(self):
+        """Validate {{ constraint.description }}"""
+        for record in self:
+            # TODO: Implement validation logic
+            if not {{ constraint.condition }}:
+                raise ValidationError(_('{{ constraint.error_message }}'))
+{% endfor %}
+
+{% endif %}
+{% if custom_methods %}
+    # Business logic methods
+{% for method in custom_methods %}
+    def {{ method.name }}(self{{ ', ' + method.params if method.params }}):
+        """{{ method.description }}"""
+        # TODO: Implement business logic
+        pass
+{% endfor %}
+{% endif %}

@@ -1,0 +1,119 @@
+# {{ sop_title }}
+
+**Document ID**: {{ sop_id }}
+**Version**: {{ version }}
+**Effective Date**: {{ effective_date }}
+**Last Review**: {{ last_review_date }}
+**Next Review**: {{ next_review_date }}
+**Department**: {{ department }}
+**Author**: {{ author }}
+**Approver**: {{ approver }}
+
+---
+
+## 1. Purpose
+
+{{ purpose }}
+
+---
+
+## 2. Scope
+
+{{ scope }}
+
+---
+
+## 3. Responsibilities
+
+{% for role in responsibilities %}
+### {{ role.title }}
+{{ role.description }}
+
+**Tasks**:
+{% for task in role.tasks %}
+- {{ task }}
+{% endfor %}
+
+{% endfor %}
+
+---
+
+## 4. Procedure
+
+{% for step in steps %}
+### Step {{ loop.index }}: {{ step.title }}
+
+**Responsible**: {{ step.responsible }}
+**Duration**: {{ step.duration }}
+
+{{ step.description }}
+
+{% if step.substeps %}
+**Sub-steps**:
+{% for substep in step.substeps %}
+{{ loop.index }}. {{ substep }}
+{% endfor %}
+{% endif %}
+
+{% if step.checklist %}
+**Checklist**:
+{% for item in step.checklist %}
+- [ ] {{ item }}
+{% endfor %}
+{% endif %}
+
+{% if step.notes %}
+**Notes**: {{ step.notes }}
+{% endif %}
+
+{% endfor %}
+
+---
+
+## 5. Quality Control
+
+{% for control in quality_controls %}
+### {{ control.title }}
+{{ control.description }}
+
+**Acceptance Criteria**:
+{% for criterion in control.criteria %}
+- {{ criterion }}
+{% endfor %}
+
+{% endfor %}
+
+---
+
+## 6. References
+
+{% for ref in references %}
+- **{{ ref.title }}**: {{ ref.description }} ({{ ref.location }})
+{% endfor %}
+
+---
+
+## 7. Error Codes and Troubleshooting
+
+| Error Code | Description | Resolution |
+|------------|-------------|------------|
+{% for error in error_codes %}
+| {{ error.code }} | {{ error.description }} | {{ error.resolution }} |
+{% endfor %}
+
+---
+
+## 8. Revision History
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+{% for revision in revision_history %}
+| {{ revision.version }} | {{ revision.date }} | {{ revision.author }} | {{ revision.changes }} |
+{% endfor %}
+
+---
+
+**Document Control**:
+- **Classification**: {{ classification }}
+- **Distribution**: {{ distribution }}
+- **Retention Period**: {{ retention_period }}

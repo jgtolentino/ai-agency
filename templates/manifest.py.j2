@@ -1,0 +1,51 @@
+# -*- coding: utf-8 -*-
+# Copyright {{ year }} {{ author }}
+# License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl-3.0).
+
+{
+    'name': '{{ display_name }}',
+    'version': '{{ version }}',
+    'category': '{{ category }}',
+    'summary': '{{ summary }}',
+    'description': """
+{{ description }}
+    """,
+    'author': '{{ author }}',
+    'website': '{{ website }}',
+    'license': 'LGPL-3',
+    'depends': [
+{% for dep in depends %}
+        '{{ dep }}',
+{% endfor %}
+    ],
+    'data': [
+{% if has_security %}
+        'security/ir.model.access.csv',
+{% endif %}
+{% for view_file in view_files %}
+        '{{ view_file }}',
+{% endfor %}
+{% for data_file in data_files %}
+        '{{ data_file }}',
+{% endfor %}
+    ],
+{% if demo_files %}
+    'demo': [
+{% for demo_file in demo_files %}
+        '{{ demo_file }}',
+{% endfor %}
+    ],
+{% endif %}
+    'installable': True,
+    'application': {{ application|lower }},
+    'auto_install': False,
+{% if external_dependencies %}
+    'external_dependencies': {
+        'python': [
+{% for py_dep in external_dependencies.python %}
+            '{{ py_dep }}',
+{% endfor %}
+        ],
+    },
+{% endif %}
+}
